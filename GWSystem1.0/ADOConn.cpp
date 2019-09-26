@@ -18,6 +18,7 @@ void ADOConn::OnInitADOConn(void)
 		m_pConnection.CreateInstance("ADODB.Connection");
 		_bstr_t strConnect="Dsn=Cellx64.0.01";
 		m_pConnection->Open(strConnect,"","",adModeUnknown);
+
 	}
 	catch(_com_error e)
 	{

@@ -27,6 +27,7 @@
 extern Scanning_Control *m_Scanning_Control;
 extern CGWSystem10Dlg* pDlg;
 extern vector <PatientWithSlide> tempAllPatients;
+extern bool AnalyseFinishedCHRO;
 //全局变量
 CChromosomeHandle * pHandleDlg;
 CChromosomeResult * pChromosomeResult;
@@ -255,6 +256,8 @@ void CChromosomeHandle::OnBnClickedBtnChrohandle()
 {
 	GetDlgItem(IDC_BTN_CHROHANDLE)->EnableWindow(FALSE);//无lisr选项选中使删除按钮变灰
 
+	AnalyseFinishedCHRO = false;
+
 	//1.获取所选中的病人数组，加入AllPatientsChose
 	int nItem, i;
 	nItem = m_listchrohandle.GetItemCount();
@@ -448,6 +451,9 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 	//关闭python调用
 	//**************************************************************************************************
 	Py_Finalize();
+
+	//分析结束
+	AnalyseFinishedCHRO = true;
 }
 
 

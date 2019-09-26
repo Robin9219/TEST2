@@ -88,6 +88,7 @@ public:
 	POINT old;
 	
 	bool BuildOrNotMN = false;
+	bool BuildOrNotCHRO = false;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();

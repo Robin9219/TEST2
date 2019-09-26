@@ -65,6 +65,7 @@ bool AnalyseFinishedCHRO = true;
 
 //CMicroNucleusHandle *pMicroHandle = new CMicroNucleusHandle;
 unique_ptr<CMicroNucleusHandle>pMicroHandle(new CMicroNucleusHandle);
+unique_ptr<CChromosomeHandle>pChroHandle(new CChromosomeHandle);
 
 
 //参数传递
@@ -1042,12 +1043,17 @@ void CGWSystem10Dlg::OnClose()
 //染色体分析
 void CGWSystem10Dlg::OnBnClickedBtnIkarosrst()
 {
+
 	// TODO:  在此添加控件通知处理程序代码
-	CChromosomeHandle *pChroHandle = new CChromosomeHandle;
-	pChroHandle->Create(IDD_CHROSOMEHANDLE, this);
-	//将当前存图路径和处理结果存储路径传递给微核分析界面以初始化
-	HWND   hwnd = ::FindWindow(NULL, _T("染色体处理"));//调用消息处理函数刷新页面
-	::SendMessage(hwnd, WM_HANDLEPATHCHRO, (WPARAM)&AllFiles, NULL);//线程中传递定时器消息，以开启定时器，刷新显示照片
+	if (!BuildOrNotCHRO)
+	{
+		/*CChromosomeHandle *pChroHandle = new CChromosomeHandle;*/
+		pChroHandle->Create(IDD_CHROSOMEHANDLE, this);
+		//将当前存图路径和处理结果存储路径传递给微核分析界面以初始化
+		HWND   hwnd = ::FindWindow(NULL, _T("染色体处理"));//调用消息处理函数刷新页面
+		::SendMessage(hwnd, WM_HANDLEPATHCHRO, (WPARAM)&AllFiles, NULL);//线程中传递定时器消息，以开启定时器，刷新显示照片
+		BuildOrNotCHRO = true;
+	}
 	pChroHandle->ShowWindow(SW_SHOW);
 
 }
