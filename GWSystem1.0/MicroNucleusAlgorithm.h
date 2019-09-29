@@ -22,6 +22,9 @@ public:
 	int MultiCellsWithMN[20];
 	int SaveNum;
 
+	vector<string>ImgWaitingForAna;
+	vector<string>ImgFormatConvert;
+	int alalysedNum;
 
 	int  shape_judge(Mat img);
 
@@ -40,7 +43,9 @@ public:
 	void   distinguish(string pathName1, string fileName2, string  pathName2, string fileName3);
 
 	//处理主函数
-	MN_HandleResult* handlemicronucleus(string road1name1, string file1name1, string writename, CString patientname, MN_HandleResult *pB, string processfile);
+	MN_HandleResult* handlemicronucleus(string road1name1, string file1name1,
+		string writename, CString patientname, MN_HandleResult *pB, string processfile,
+		int analysenum, int Imgsum);
 
 	void readImgNamefromFile(char* fileName, vector <string> &imgNames);
 

@@ -1,0 +1,10 @@
+﻿生成启动时间为 2019/9/27 21:20:40。
+     1>项目“E:\GWSystem_GIT\GWsystem_CACB\GWSystem1.0\GWSystem1.0.vcxproj”在节点 2 上(Build 个目标)。
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(935,5): warning MSB8027: Two or more files with the name of mywatershed.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are mywatershed.cpp, 染色体算法文件\mywatershed.cpp.
+     1>Link:
+         GWSystem1.0.vcxproj -> E:\GWSystem_GIT\GWsystem_CACB\x64\Release\GWSystem1.0.exe
+     1>已完成生成项目“E:\GWSystem_GIT\GWsystem_CACB\GWSystem1.0\GWSystem1.0.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:00.06
