@@ -28,6 +28,8 @@ public:
 
 	int  shape_judge(Mat img);
 
+
+
 	//生成随机颜色函数
 	Vec3b RandomColorMN(int value);
 
@@ -43,9 +45,8 @@ public:
 	void   distinguish(string pathName1, string fileName2, string  pathName2, string fileName3);
 
 	//处理主函数
-	MN_HandleResult* handlemicronucleus(string road1name1, string file1name1,
-		string writename, CString patientname, MN_HandleResult *pB, string processfile,
-		int analysenum, int Imgsum);
+	MN_HandleResult* handlemicronucleus(string road1name1, string file1name1, string writename, CString patientname,
+		MN_HandleResult *pB, int analysenum, int Imgsum);
 
 	void readImgNamefromFile(char* fileName, vector <string> &imgNames);
 

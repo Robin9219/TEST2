@@ -124,4 +124,5 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	afx_msg void OnClose();
+	CEdit m_analysenum;
 };

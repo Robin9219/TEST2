@@ -78,6 +78,7 @@ void CMicroNucleusHandle::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DATESTARTMN, m_datetimebegin);
 	DDX_Control(pDX, IDC_DATEENDMN, m_datetimeend);
 	DDX_Control(pDX, IDC_LIST_RESULTCHRO, m_resultchrolist);
+	DDX_Control(pDX, IDC_EDIT_ANANUM, m_analysenum);
 }
 
 
@@ -166,6 +167,11 @@ BOOL CMicroNucleusHandle::OnInitDialog()
 	m_listmicrohandle.SetFont(&m_font);
 	//m_resultchrolist.SetFont(&m_font);
 	GetDlgItem(IDC_LISTHEADMN)->SetFont(&m_font);
+
+	//设置默认批量
+	pHandleDlg->m_analysenum.SetWindowTextW(_T("100"));
+
+
 	//获取路径
 	//m_handlepath.GetWindowTextW(ReadPath);
 	//m_resultpath.GetWindowTextW(WritePath);
@@ -270,86 +276,6 @@ void CMicroNucleusHandle::OnBnClickedBtnMicrohandle()
 void  CMicroNucleusHandle::ThreadProcWaitMN()
 {
 
-	// 初始化Python
-	//在使用Python系统前，必须使用Py_Initialize对其
-	//进行初始化。它会载入Python的内建模块并添加系统路
-	//径到模块搜索路径中。这个函数没有返回值，检查系统
-	//是否初始化成功需要使用Py_IsInitialized。
-	//Py_Initialize();
-	//if (!Py_IsInitialized())
-	//{
-	//	return;
-	//}
-
-	//PyObject * pModule = NULL;
-	//PyObject * pFunc = NULL;
-	//
-	////PyRun_SimpleString("import sys");
-	////PyRun_SimpleString("sys.path.append('./')");
-
-	//PyObject* pName = PyUnicode_FromString("test0719");
-	//pModule = PyImport_Import(pName);
-	//cout << "test0719:" << pModule;
-	//pFunc = PyObject_GetAttrString(pModule, "classifier_pridictor_keras");
-	//if (!pFunc || !PyCallable_Check(pFunc))
-	//{
-	//	printf("can't find function [classifier_pridictor]");
-	//	getchar();
-	//}
-	//else
-	//{
-	//	cout << "open function [classifier_pridictor]" << endl;
-	//}
-
-
-
-	//init_numpy();
-	// 检查初始化是否成功
-
-
-	//显示python版本信息
-	//cout << (Py_GetVersion()) << "\n";
-	//PyObject* sys = PyImport_ImportModule("sys");
-	//PyRun_SimpleString("import  sys");
-
-	//PyRun_SimpleString("print('come in python')");
-	//PyRun_SimpleString("import  sys"); // 执行 python 中的短语句  
-	//PyRun_SimpleString("sys.path.append('./')");
-	//PyRun_SimpleString("import cv2");
-
-	////PyRun_SimpleString("import  sys"); // 执行 python 中的短语句  
-	////PyRun_SimpleString("sys.path.append('./')");
-	////PyRun_SimpleString("import cv2");
-
-	//// load python script
-	//PyObject* pName = PyUnicode_FromString("predictSX");
-	//PyObject* pModule = PyImport_Import(pName);
-	//if (!pModule) {
-	//	//std::cout << "can't find predict.py" << std::endl;
-	//	//getchar();
-	//	return;
-	//}
-	//else
-	//{
-	//	//cout << "open Module" << endl;
-	//}
-	//PyObject* pDict = PyModule_GetDict(pModule);
-	//if (!pDict)
-	//{
-	//	return;
-	//}
-	//pFunc = PyDict_GetItemString(pDict, "classifier_pridictor");
-	//if (!pFunc || !PyCallable_Check(pFunc))
-	//{
-	//	//printf("can't find function [classifier_pridictor]");
-	//	//getchar();
-	//	return;
-	//}
-	//else
-	//{
-	//	//cout << "open function [classifier_pridictor]" << endl;
-	//}
-
 	//生成处理时间
 
 	CTime time = CTime::GetCurrentTime(); ///构造CTime对象
@@ -367,6 +293,10 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 
 	pHandleDlg->ResultRow = 0;
 
+	//获取批量
+	CString strAnalyseNum;
+	pHandleDlg->m_analysenum.GetWindowTextW(strAnalyseNum);
+	int analysenum = _ttoi(strAnalyseNum);
 
 	for (size_t i = 0; i < pHandleDlg->AllPatientsChose.size(); i++)
 	{
@@ -419,13 +349,14 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 					continue;
 				}
 
-				//处理过程文件堆放的文件夹
-				pHandleDlg->strFileProcess = StrFileSolve + "过程文件\\";
-				const char* c_fileprocess = pHandleDlg->strFileProcess.c_str();//将路径转换成 const char
-				_mkdir(c_fileprocess);
+				////处理过程文件堆放的文件夹
+				//pHandleDlg->strFileProcess = StrFileSolve + "过程文件\\";
+				//const char* c_fileprocess = pHandleDlg->strFileProcess.c_str();//将路径转换成 const char
+				//_mkdir(c_fileprocess);
 
-				pHandleDlg->AllPatientsChose[i].Result = algorithm.handlemicronucleus(readpath, imgname, StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName, pB, pHandleDlg->strFileProcess);
-				deletedPicNum = pHandleDlg->AllPatientsChose[i].Result->delPictureNum;
+				pHandleDlg->AllPatientsChose[i].Result =
+					algorithm.handlemicronucleus(readpath, imgname, StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName,
+					pB, analysenum, pHandleDlg->AllPatientsChose[i].MicroImgNames.size());
 				pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
 				pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].MicroImgNames.size() + 1;
 				pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;

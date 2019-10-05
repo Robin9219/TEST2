@@ -16,10 +16,12 @@
 #include "python.h"
 #include "numpy\core\include\numpy\arrayobject.h"
 
+#include "windows.h"
 #include <direct.h>
 #include<functional>
 #include<numeric>
 #include <string>
+#include <io.h>  
 
 #include<iostream>
 #include<fstream>
@@ -36,6 +38,10 @@ vector <string>  imgNames5_2;
 vector <string>  imgNames_imgvec; 
 vector <string>  imgNames_imgvec_NoBlack;
 vector<cv::Mat> imgvec;//存放待CNN识别的MAT数组
+
+string result[40000];
+string result_name[20000];
+string result_num[20000];
 
 CMicroNucleusAlgorithm::CMicroNucleusAlgorithm()
 {
@@ -535,10 +541,9 @@ PyObject* StringToPyByWin(std::string str)
 }
 //处理主函数
 MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(string road1name1, string file1name1, string writename, CString patientname,
-	MN_HandleResult *pB, string processfile, int analysenum, int Imgsum)
+	MN_HandleResult *pB, int analysenum, int Imgsum)
 {
 	//将该照片的分析结果初始
-
 
 	string read1name1 = road1name1 + file1name1;//读取的总路径
 	ImgWaitingForAna.push_back(read1name1);
@@ -550,257 +555,314 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(string road1name1, s
 		cout << "图片总数：" << Imgsum << endl;
 		//ofstream os("‪C:\\Users\\xibao\\Desktop\\2.txt");     //创建一个文件输出流对象
 		FILE *fp = NULL;
-		fp = fopen("E:\\1.txt", "w");
+		fp = fopen("C:\\Users\\xibao\\Desktop\\111.txt", "w");
 		for (size_t i = 0; i < ImgWaitingForAna.size(); i++)
 		{
-			fprintf(fp, ImgWaitingForAna[i].c_str());
+			string enter = "\n";
+			string oneImgpath = ImgWaitingForAna[i] + enter;
+			fprintf(fp, oneImgpath.c_str());
 			cout << "read1name1:" << ImgWaitingForAna[i] << endl;
 			//转换后的文件格式
-			int pos0_3 = ImgWaitingForAna[i].rfind("_"); //, s_file_path.length()
-			string fn1_2 = ImgWaitingForAna[i].substr(pos0_3 + 1, ImgWaitingForAna[i].length());//读取路径最后的文件名,仅保留数字名字，不要中文
-			string filename = "t" + fn1_2 + ".txt";
-			ImgFormatConvert.push_back(filename);
+			//int pos0_3 = ImgWaitingForAna[i].rfind("_"); //, s_file_path.length()
+			//string fn1_2 = ImgWaitingForAna[i].substr(pos0_3 + 1, ImgWaitingForAna[i].length());//读取路径最后的文件名,仅保留数字名字，不要中文
+			//string filename = "t" + fn1_2 + ".txt";
+			//ImgFormatConvert.push_back(filename);
 		}
 		fclose(fp);
 
 		//调用分析软件.exe
-		HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\111vector_predict - 已集成全流程-0820-py生成TXT\\x64\\Release\\opencv_cpp2py.exe", NULL, NULL, SW_HIDE);
+		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "‪E:\\GWsystem\\111vector_predict\\x64\\Release", NULL, NULL, SW_SHOW);
+		HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\Release\\opencv_cpp2py.exe", NULL, NULL, SW_SHOW);
+		if ((int)hNewExe == ERROR_FILE_NOT_FOUND)
+		{
+			std::cout << "指定工作目录：文件找不到" << std::endl;
+		}
+
+		//CString path = _T("‪‪E:\\GWsystem\\111vector_predict\\x64\\Release\\opencv_cpp2py.exe");
+		//SHELLEXECUTEINFO ShExecInfo = { 0 };
+		//ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+		//ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		//ShExecInfo.hwnd = NULL;
+		//ShExecInfo.lpVerb = _T("open");
+		//ShExecInfo.lpFile = path;
+		//ShExecInfo.lpParameters = _T(" "); //-a a
+		//ShExecInfo.lpDirectory = NULL;
+		//ShExecInfo.nShow = SW_SHOW;
+		//ShExecInfo.hInstApp = NULL;
+		//ShellExecuteEx(&ShExecInfo);
+
+
+
 
 		//从out.txt中读取处理结果
 		bool nothing = true;
 		fstream file;
 		int ch;
+
+
 		while (nothing)
 		{
-			for (size_t i = 0; i < ImgFormatConvert.size(); i++)
+			string wholefilename = "E:\\tmp\\321\\tNMresult.txt";
+			int nFileExit = _access(wholefilename.c_str(), 0);
+			if (nFileExit == 0)
 			{
-				string wholefilename = "E:\\tmp\\321\\" + ImgFormatConvert[i];
-				/*cout << "wholefilename" << wholefilename<<endl;*/
-
-				int nFileExit = _access(wholefilename.c_str(), 0);
-				if (nFileExit == 0)
+				//存在
+				nothing = false;
+				//解析结果
+				Sleep(500);
+				fstream fin(wholefilename);
+				// 打开文件成功
+				string aa[20000];
+				int rowNum = 0;
+				if (fin)
 				{
-					//存在
-					nothing = false;
-					//读取TXT中内容，看是否为000
-					FILE* pf = fopen(wholefilename.c_str(), "r");
-					if (NULL == pf)
-						return pB;
-					char cstr[256];
-					fscanf(pf, "%s", cstr);
-					cout << cstr << endl;
-					if (cstr == "000")
-						return pB;
-					else
+					for (int i = 0; fin >> aa[i]; i++)
 					{
-						//解析结果
-						fstream fin(wholefilename);
-						// 打开文件成功
-						string aa[20000];
-						int rowNum = 0;
-						if (fin)
-						{
-
-							for (int i = 0; fin >> aa[i]; i++)
-							{
-								//cout<<"第 "<<(++rowNum)<<" 行数据："<<a[i] <<" i："<<i <<" " << endl;
-								++rowNum;
-							}
-
-							fin.close();
-						}
-						else
-						{
-							cerr << "打开文件失败！" << endl;
-						}
-						;
-
-						for (int i = 0; i<rowNum; i++)
-						{
-							//cout << "第 " << (i) << " 行数据：" << aa[i] << " " << endl;
-
-
-						}
-
-
-						char* cc4_3;
-						const int len4_1 = aa[0].length();
-						cc4_3 = new char[len4_1 + 1];
-						strcpy(cc4_3, aa[0].c_str());
-						char* fileName4_3 = cc4_3;
-						//cout << "fileName4_3: " << fileName4_3 << endl;
-
-						int a = 0;
-						char *ptr;//释放内存
-						char *p;
-						char strs[] = " ";
-						string result[3000];
-
-						string result_name[1500];
-						string result_num[1500];
-
-
-						if (strcmp(fileName4_3, strs) != 0)
-						{
-							ptr = strtok_s(fileName4_3, ",", &p);
-							while (ptr != NULL)
-							{
-								//从1开始
-								//printf("ptr%d=%s\n", a, ptr);
-
-
-								//cout << "ptr为：" << endl;
-								//cout << ptr;
-								//cout << endl;
-
-								result[a] = ptr;
-
-
-
-								//cout << "result[a]为：" << a<<endl;
-								//cout << result[a];
-								//cout << endl;
-								a++;
-								ptr = strtok_s(NULL, ",", &p);
-
-							}
-						}
-
-						cout << "11111a: " << a << endl;
-						for (int i = 1; i <a; i++)//从1开始，到a结束
-						{
-							if (i<((a + 1) / 2)){
-								result_name[i] = result[i];
-								//cout <<i<< "result_name[i]: " << result_name[i] << endl;
-							}
-							else{
-								result_num[i - ((a + 1) / 2) + 1] = result[i];
-								//cout << i - ((a + 1) / 2) + 1 << "result_num[i - ((a+1)/2)]: " << result_num[i - ((a + 1) / 2) + 1] << endl;
-							}
-
-
-
-						}
-						int pos6_1;
-						string fn6_1;
-						//cout << "resul_name[i]: " << result_name[0] << endl;
-						for (int i = 1; i < ((a + 1) / 2); i++)//从1开始
-						{
-							string strSaveNum;
-							//SaveNum = i;
-							int pos6_1 = result_name[i].rfind("\\");
-							fn6_1 = result_name[i].substr(pos6_1 + 1, result_name[i].length());//读取路径最后的文件名
-							int posforward = result[0].rfind("\\");
-							string forwardname = result[0].substr(0, posforward);
-							posforward = forwardname.rfind("\\");
-							forwardname = forwardname.substr(0, posforward);
-							posforward = forwardname.rfind("\\");
-							forwardname = forwardname.substr(0, posforward);
-
-							string wholename = forwardname + "\\wuhei-fuhe\\" + fn6_1;
-							result_name[i] = wholename;
-
-							cout << "[i]: " << i << endl;
-							cout << "resul_name[i]: " << result_name[i] << endl;
-							cout << "result_num[i]: " << result_num[i] << endl;
-
-							WCHAR   wstr[MAX_PATH];
-							char sucTempFilePath[MAX_PATH + 1];
-							sprintf_s(sucTempFilePath, "%s", result_name[i].c_str());
-							MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
-
-
-							switch (stoi(result_num[i]))
-							{
-							case 0://普通双核
-								pB->DoubleCellsWithMN[0]++;
-								DoubleCellsWithMN[0]++;
-								pB->doublecell++;
-								pB->sumcell++;
-
-								// 有双核，保存图片和结果
-								char DesTempFilePath1[MAX_PATH + 1];
-								WCHAR   wstr_des1[MAX_PATH];
-								//strSaveNum = to_string(SaveNum);
-								strSaveNum = fn6_1;
-								sprintf_s(DesTempFilePath1, "%s", (writename + strSaveNum).c_str());
-								MultiByteToWideChar(CP_ACP, 0, DesTempFilePath1, -1, wstr_des1, sizeof(wstr_des1));
-								CopyFile(wstr, wstr_des1, TRUE);
-								OnePicResult->picpath = (writename + strSaveNum).c_str();
-								OnePicResult->NumCells = 2;
-								OnePicResult->NumMicro = 0;
-								OnePicResult->patientname = patientname;
-								//将该张照片的分析结果存到数据库
-								ReadMN.SaveOnePicMNResult(OnePicResult);
-								SaveNum++;
-								break;
-							case 3:
-								pB->SingleCellsWithMN[0]++;
-								SingleCellsWithMN[0]++;
-								pB->singlecell++;
-								pB->sumcell++;
-
-								break;
-							case 1://双核为何
-								pB->DoubleCellsWithMN[1]++;
-								DoubleCellsWithMN[1]++;//无法判断双核细胞中的微核数量
-								pB->doublecell++;
-								pB->sumcell++;
-								pB->doublecell_wh++;//含有微核的单核细胞数
-								// 有双核微核，保存图片和结果
-								char DesTempFilePath2[MAX_PATH + 1];
-								WCHAR   wstr_des2[MAX_PATH];
-								//strSaveNum = to_string(SaveNum);
-								strSaveNum = fn6_1;
-								sprintf_s(DesTempFilePath2, "%s", (writename + strSaveNum).c_str());
-								MultiByteToWideChar(CP_ACP, 0, DesTempFilePath2, -1, wstr_des2, sizeof(wstr_des2));
-								CopyFile(wstr, wstr_des2, TRUE);
-								OnePicResult->picpath = (writename + strSaveNum).c_str();
-								OnePicResult->NumCells = 2;
-								OnePicResult->NumMicro = 1;
-								OnePicResult->patientname = patientname;
-								//将该张照片的分析结果存到数据库
-								ReadMN.SaveOnePicMNResult(OnePicResult);
-								SaveNum++;
-
-								break;
-
-							case 5:
-								TripleCellsWithMN[0]++;
-								pB->TripleCellsWithMN[0]++;
-								pB->multiplecell++;
-								pB->sumcell++;
-								break;
-							case 4:
-								MultiCellsWithMN[0]++;
-								pB->MultiCellsWithMN[0]++;
-								pB->multiplecell++;
-								pB->sumcell++;
-								break;
-							}
-
-							DeleteFile(wstr);
-
-						}
-
-						vector<string>().swap(imgNames4_1);
-						vector<string>().swap(imgNames0_1);
-						//imgNames0_1.erase(imgNames0_1.begin(),imgNames0_1.end());
+						cout<<"第 "<<(++rowNum)<<" 行数据："<<aa[i] <<" i："<<i <<" " << endl;
+						++rowNum;
 					}
-					fclose(pf);
 
-
-					WCHAR   wstr[MAX_PATH];
-					char sucTempFilePath[MAX_PATH + 1];
-					sprintf_s(sucTempFilePath, "%s", wholefilename.c_str());
-					MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
-					DeleteFile(wstr);
+					fin.close();
 				}
 				else
 				{
-					//不存在
-					nothing = true;
+					cerr << "打开文件失败！" << endl;
 				}
+			
+				for (int i = 0; i<rowNum; i++)
+				{
+					//cout << "第 " << (i) << " 行数据：" << aa[i] << " " << endl;
+				}
+
+				char* cc4_3;
+				const int len4_1 = aa[0].length();
+				cc4_3 = new char[len4_1 + 1];
+				strcpy(cc4_3, aa[0].c_str());
+				char* fileName4_3 = cc4_3;
+				//cout << "fileName4_3: " << fileName4_3 << endl;
+
+				int a = 0;
+				char *ptr;//释放内存
+				char *p;
+				char strs[] = " ";
+				//string result[3000];
+
+				//string result_name[2000];
+				//string result_num[2000];
+
+
+				if (strcmp(fileName4_3, strs) != 0)
+				{
+					ptr = strtok_s(fileName4_3, ",", &p);
+					while (ptr != NULL)
+					{
+						//从1开始
+						//printf("ptr%d=%s\n", a, ptr);
+
+						//cout << "ptr为：" << endl;
+						//cout << ptr;
+						//cout << endl;
+
+						result[a] = ptr;
+
+						//cout << "result[a]为：" << a<<endl;
+						//cout << result[a];
+						//cout << endl;
+						a++;
+						ptr = strtok_s(NULL, ",", &p);
+
+					}
+				}
+
+				cout << "数量((a + 1) / 2)-1: " << ((a + 1) / 2) - 1 << endl;
+				////cout << "result[0]: " << result[0] << endl;
+				result_name[0] = "000";
+				result_num[0] = "000";
+
+				for (int i = 1; i <= a; i++)//从1开始，到a结束
+				{
+					if (i<((a + 1) / 2))
+					{
+						//cout << i << endl;
+						result_name[i] = result[i];
+						//cout <<i<< "result_name[i]: " << result_name[i] << endl;
+						//cout << result[i] << endl;
+					}
+
+					if (i >= ((a + 1) / 2)){
+						//cout << i << endl;
+						result_num[i - ((a + 1) / 2) + 1] = result[i];
+						//cout << result[i] << endl;
+						//cout << i - ((a + 1) / 2) + 1 << " result_num:  " << result_num[i - ((a + 1) / 2) + 1] << endl;
+					}
+
+
+
+				}
+				int pos6_1;
+				string fn6_1;
+
+				//cout << "[0]: " << 0 << endl;
+				//cout << "resul_name[0]: " << result[0] << endl;
+
+				//cout << "result[0]: " << result[0] << endl;
+				for (int i = 1; i < ((a + 1) / 2); i++)//从1开始
+				{
+
+					int pos6_1 = result_name[i].rfind("\\");
+					fn6_1 = result_name[i].substr(pos6_1 + 1, result_name[i].length());//读取路径最后的文件名
+					result_name[i] = result[0] + fn6_1;
+
+					//cout << "[i]: " << i << endl;
+					//cout << "resul_name[i]: " << result_name[i] << endl;
+					//cout << "result_num[i]: " << result_num[i] << endl;
+
+					//WCHAR   wstr[MAX_PATH];
+					//char sucTempFilePath[MAX_PATH + 1];
+					//sprintf_s(sucTempFilePath, "%s", result_name[i].c_str());
+					//MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
+					string wholepath;
+					string newdirectory;
+					const char* c_wholepath;
+					Mat image;
+
+					switch (stoi(result_num[i]))
+					{
+
+					case 0://普通双核
+						pB->DoubleCellsWithMN[0]++;
+						DoubleCellsWithMN[0]++;
+						pB->doublecell++;
+						pB->sumcell++;
+
+						// 有双核，保存图片和结果
+						image = imread(result_name[i], 1);//读取原图
+						newdirectory = writename + "shuang\\";
+						c_wholepath = newdirectory.c_str();//将路径转换成 const char
+						_mkdir(c_wholepath);
+
+						wholepath = writename + "shuang\\" + fn6_1;
+						cv::imwrite(wholepath, image);//保存滤波结果，生成文件
+						OnePicResult->picpath = wholepath.c_str();
+						OnePicResult->NumCells = 2;
+						OnePicResult->NumMicro = 0;
+						OnePicResult->patientname = patientname;
+						//将该张照片的分析结果存到数据库
+						ReadMN.SaveOnePicMNResult(OnePicResult);
+						SaveNum++;
+						break;
+
+					case 3:
+						pB->SingleCellsWithMN[0]++;
+						SingleCellsWithMN[0]++;
+						pB->singlecell++;
+						pB->sumcell++;
+
+						break;
+					case 1://双核为何
+						pB->DoubleCellsWithMN[1]++;
+						DoubleCellsWithMN[1]++;//无法判断双核细胞中的微核数量
+						pB->doublecell++;
+						pB->sumcell++;
+						pB->doublecell_wh++;//含有微核的单核细胞数
+
+						// 有双核微核，保存图片和结果
+						image = imread(result_name[i], 1);//读取原图
+						newdirectory = writename + "weihe\\";
+						c_wholepath = newdirectory.c_str();//将路径转换成 const char
+						_mkdir(c_wholepath);
+						wholepath = writename + "weihe\\" + fn6_1;
+						cv::imwrite(wholepath, image);//保存滤波结果，生成文件
+						OnePicResult->picpath = wholepath.c_str();
+
+						OnePicResult->NumCells = 2;
+						OnePicResult->NumMicro = 1;
+						OnePicResult->patientname = patientname;
+						//将该张照片的分析结果存到数据库
+						ReadMN.SaveOnePicMNResult(OnePicResult);
+						SaveNum++;
+
+						break;
+
+					case 5:
+						TripleCellsWithMN[0]++;
+						pB->TripleCellsWithMN[0]++;
+						pB->multiplecell++;
+						pB->sumcell++;
+						image = imread(result_name[i], 1);//读取原图
+						newdirectory = writename + "duo\\";
+						c_wholepath = newdirectory.c_str();//将路径转换成 const char
+						_mkdir(c_wholepath);
+
+						wholepath = writename + "duo\\" + fn6_1;
+						cv::imwrite(wholepath, image);//保存滤波结果，生成文件
+						OnePicResult->NumCells = 3;
+						OnePicResult->NumMicro = 1;
+						OnePicResult->patientname = patientname;
+						//将该张照片的分析结果存到数据库
+						ReadMN.SaveOnePicMNResult(OnePicResult);
+						SaveNum++;
+						break;
+					case 4:
+						MultiCellsWithMN[0]++;
+						pB->MultiCellsWithMN[0]++;
+						pB->multiplecell++;
+						pB->sumcell++;
+
+						//image = imread(result_name[i], 1);//读取原图
+						//newdirectory = writename + "duo\\";
+						//c_wholepath = newdirectory.c_str();//将路径转换成 const char
+						//_mkdir(c_wholepath);
+
+						//wholepath = writename + "duo\\" + fn6_1;
+						//cv::imwrite(wholepath, image);//保存滤波结果，生成文件
+
+						//OnePicResult->NumCells = 3;
+						//OnePicResult->NumMicro = 1;
+						//OnePicResult->patientname = patientname;
+						////将该张照片的分析结果存到数据库
+						//ReadMN.SaveOnePicMNResult(OnePicResult);
+						//SaveNum++;
+						break;
+					}
+
+
+
+					//if (result_num[i] == "0"){  //双核
+					//	Mat image = imread(result_name[i], 1);//读取原图
+					//	cv::imwrite("E:\\fenlei-0930\\EIwu\\2-1\\shuang\\" + fn6_1, image);//保存滤波结果，生成文件
+					//}
+
+					//if (result_num[i] == "1"){  //微核
+					//	Mat image = imread(result_name[i], 1);//读取原图
+					//	cv::imwrite("E:\\fenlei-0930\\EIwu\\2-1\\weihe\\" + fn6_1, image);//保存滤波结果，生成文件
+					//}
+
+					//if (result_num[i] == "4"){  //多核
+					//	Mat image = imread(result_name[i], 1);//读取原图
+					//	cv::imwrite("E:\\fenlei-0930\\EIwu\\2-1\\duo\\" + fn6_1, image);//保存滤波结果，生成文件
+					//}
+
+
+
+				}
+
+				vector<string>().swap(imgNames4_1);
+				vector<string>().swap(imgNames0_1);
+
+				//删除本次分析结果的txt，避免下次认定错误
+
+				WCHAR   wstr[MAX_PATH];
+				char sucTempFilePath[MAX_PATH + 1];
+				sprintf_s(sucTempFilePath, "%s", wholefilename.c_str());
+				MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
+				DeleteFile(wstr);
+
+			}
+			else
+			{
+				//不存在
+				nothing = true;
 			}
 
 
@@ -816,97 +878,6 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(string road1name1, s
 	}
 
 
-
-	//调用分析软件.exe
-	//string str12 = "‪C:\\Users\\xibao\\Desktop\\opencv_cpp2py.exe.lnk";
-	//string command_rd = "start " + str12;
-	//cout <<" command_rd:"<< command_rd << endl;
-	//system(command_rd.c_str());
-	//WinExec("D:\\Desktop back up\\新建文件夹 (3)\\cpp_call_py\\111vector_predict - 已集成全流程-0820-py生成TXT\\x64\\Release\\opencv_cpp2py.exe", SW_SHOWMAXIMIZED);
-
-
-
-
-	//for (int i = 1; i < a / 2 + 1; i++)//从1开始file3name6
-	//{
-
-
-	//	int pos6_1 = resul_name[i].rfind("\\");
-	//	fn6_1 = resul_name[i].substr(pos6_1 + 1, resul_name[i].length());//读取路径最后的文件名
-	//	resul_name[i] = fn6_1;
-
-	//	//cout << "resul_name[i]: " << file3name2 + "\\"+resul_name[i] << endl;
-	//	//file3name4 + "\\" + resul_name[i]
-	//	WCHAR   wstr[MAX_PATH];
-	//	char sucTempFilePath[MAX_PATH + 1];
-	//	sprintf_s(sucTempFilePath, "%s", (file3name4 + "\\" + resul_name[i]).c_str());
-	//	MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
-
-
-	//	cout << "result_num[i]: " << result_num[i] << endl;
-	//	String strSaveNum;
-	//	switch (stoi(result_num[i]))
-	//	{
-	//	case 0:
-	//		pB->DoubleCellsWithMN[0]++;
-	//		DoubleCellsWithMN[0]++;
-	//		pB->doublecell++;
-	//		pB->sumcell++;
-	//		break;
-	//	case 1:
-	//		pB->DoubleCellsWithMN[1]++;
-	//		DoubleCellsWithMN[1]++;//无法判断双核细胞中的微核数量
-	//		pB->doublecell++;
-	//		pB->sumcell++;
-	//		pB->doublecell_wh++;//含有微核的单核细胞数
-	//		// 有双核微核，保存图片和结果
-	//		char DesTempFilePath[MAX_PATH + 1];
-	//		WCHAR   wstr_des[MAX_PATH];
-	//		strSaveNum = to_string(SaveNum);
-	//		sprintf_s(DesTempFilePath, "%s", (writename + strSaveNum + ".bmp").c_str());
-	//		MultiByteToWideChar(CP_ACP, 0, DesTempFilePath, -1, wstr_des, sizeof(wstr_des));
-	//		CopyFile(wstr, wstr_des, TRUE);
-	//		OnePicResult->picpath = (writename + strSaveNum + ".bmp").c_str();
-	//		OnePicResult->NumCells = 2;
-	//		OnePicResult->NumMicro = 1;
-	//		OnePicResult->patientname = patientname;
-	//		//将该张照片的分析结果存到数据库
-	//		ReadMN.SaveOnePicMNResult(OnePicResult);
-	//		SaveNum++;
-
-	//		break;
-	//	case 2:
-	//		pB->SingleCellsWithMN[0]++;
-	//		SingleCellsWithMN[0]++;
-	//		pB->singlecell++;
-	//		pB->sumcell++;
-
-	//		break;
-	//	case 3:
-	//		TripleCellsWithMN[0]++;
-	//		pB->TripleCellsWithMN[0]++;
-	//		pB->multiplecell++;
-	//		pB->sumcell++;
-	//		break;
-	//	case 4:
-	//		MultiCellsWithMN[0]++;
-	//		pB->MultiCellsWithMN[0]++;
-	//		pB->multiplecell++;
-	//		pB->sumcell++;
-	//		break;
-	//	}
-
-	//	DeleteFile(wstr);
-
-	//}
-
-
-	//删除原图
-	//char sourcePicPath[MAX_PATH + 1];
-	//WCHAR   wstr_sourpic[MAX_PATH];
-	//sprintf_s(sourcePicPath, "%s", (road1name1 + "\\" + file1name1).c_str());
-	//MultiByteToWideChar(CP_ACP, 0, sourcePicPath, -1, wstr_sourpic, sizeof(wstr_sourpic));
-	//int del = DeleteFile(wstr_sourpic);
 	return pB;//返回该病人的处理结果
 
 }
