@@ -540,19 +540,20 @@ PyObject* StringToPyByWin(std::string str)
 	return pobj;
 }
 //处理主函数
-MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(string road1name1, string file1name1, string writename, CString patientname,
-	MN_HandleResult *pB, int analysenum, int Imgsum)
+MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWaitingForAna, string writename, CString patientname,
+	MN_HandleResult *pB)
 {
-	//将该照片的分析结果初始
+	////将该照片的分析结果初始
+	//string read1name1 = road1name1 + file1name1;//读取的总路径
+	//ImgWaitingForAna.push_back(read1name1);
 
-	string read1name1 = road1name1 + file1name1;//读取的总路径
-	ImgWaitingForAna.push_back(read1name1);
 
-	if (ImgWaitingForAna.size() >= analysenum || alalysedNum>Imgsum)
-	{
+	//int currentImgNum = alalysedNum + ImgWaitingForAna.size();
+	//cout << "已分析数 +待分析数：" << currentImgNum << "     ";
+	//cout << "图片总数：" << MicroImgNames.size() << endl;
+
 		//数量超过，可分析
-		cout << "已分析数：" << alalysedNum << "     ";
-		cout << "图片总数：" << Imgsum << endl;
+
 		//ofstream os("‪C:\\Users\\xibao\\Desktop\\2.txt");     //创建一个文件输出流对象
 		FILE *fp = NULL;
 		fp = fopen("C:\\Users\\xibao\\Desktop\\111.txt", "w");
@@ -870,12 +871,12 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(string road1name1, s
 
 
 		//分析完清空数组准备下一组
-		alalysedNum = alalysedNum + ImgFormatConvert.size();
+		alalysedNum = alalysedNum + ImgWaitingForAna.size();
 
 		vector<string>().swap(ImgWaitingForAna);
 		vector<string>().swap(ImgFormatConvert);
 
-	}
+	
 
 
 	return pB;//返回该病人的处理结果

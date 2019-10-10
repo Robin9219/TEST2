@@ -99,6 +99,7 @@ public:
 	int m_point_i;
 	double m_height_best;
 
+
 	vector <int > m_Slide_ID;//储存各个聚焦点的焦距
 
 	long m_MaxFocLen_Z_Pos;//当前最佳焦距Z轴绝对位置

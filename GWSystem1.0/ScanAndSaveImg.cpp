@@ -36,9 +36,9 @@ MyFiles CScanAndSaveImg::MakeNecessaryFiles(CString savepath)
 	int m_nMinute = time.GetMinute(); ///分钟
 	int m_nSecond = time.GetSecond(); ///秒
 	CString strDate;
-	strDate.Format(_T("%d年%d月%d日"), m_nYear, m_nMonth, m_nDay); //定义日期格式
+	strDate.Format(_T("%d%d%d_"), m_nYear, m_nMonth, m_nDay); //定义日期格式
 	CString strTime = time.Format(_T("%H-%M-%S")); //定义时间格式
-	CString index(_T("的处理结果"));
+	CString index(_T("Dir"));
 	strs = strDate + strTime + index;
 	string sz3 = CT2A(strs.GetBuffer());
 	allfiles.filesolve = writeroad + sz3 + "\\";//生成结果的文件名 
@@ -47,56 +47,56 @@ MyFiles CScanAndSaveImg::MakeNecessaryFiles(CString savepath)
 	_mkdir(c_filesolve);
 
 	//抓图文件夹
-	CString picture(_T("抓图结果"));
+	CString picture(_T("picture"));
 	string  s_picture = CT2A(picture.GetBuffer());
 	allfiles.picsolve = allfiles.filesolve + s_picture + "\\";
 	const char* c_picsolve = allfiles.picsolve.c_str();//将路径转换成 const char
 	_mkdir(c_picsolve);
 
 	//处理文件夹
-	CString end(_T("处理结果"));
+	CString end(_T("handle"));
 	string  s_end = CT2A(end.GetBuffer());
 	allfiles.endsolve = allfiles.filesolve + s_end + "\\";
 	const char* c_endsolve = allfiles.endsolve.c_str();//将路径转换成 const char
 	_mkdir(c_endsolve);
 
 	//合格的照片
-	CString qua(_T("合格的图片"));
+	CString qua(_T("qua"));
 	string  s_qua = CT2A(qua.GetBuffer());
 	allfiles.quasolve = allfiles.filesolve + s_qua + "\\";
 	const char* c_quasolve = allfiles.quasolve.c_str();//将路径转换成 const char
 	_mkdir(c_quasolve);
 
 	//删除的图片
-	CString dele(_T("删除的图片"));
+	CString dele(_T("del"));
 	string  s_dele = CT2A(dele.GetBuffer());
 	allfiles.delesolve = allfiles.filesolve + s_dele + "\\";
 	const char* c_delesolve = allfiles.delesolve.c_str();//将路径转换成 const char
 	_mkdir(c_delesolve);
 
 	//不合格的图片
-	CString unq(_T("不合格的图片"));
+	CString unq(_T("unq"));
 	string  s_unq = CT2A(unq.GetBuffer());
 	allfiles.unqsolve = allfiles.filesolve + s_unq + "\\";
 	const char* c_unqsolve = allfiles.unqsolve.c_str();//将路径转换成 const char
 	_mkdir(c_unqsolve);
 
 	//聚焦路径
-	CString foc(_T("聚焦文件"));
+	CString foc(_T("focus"));
 	string  s_foc = CT2A(foc.GetBuffer());
 	allfiles.focussolve = allfiles.filesolve + s_foc + "\\";
 	const char* c_focussolve = allfiles.focussolve.c_str();//将路径转换成 const char
 	_mkdir(c_focussolve);
 
 	//10倍扫描文件夹
-	CString scan(_T("10倍扫描"));
+	CString scan(_T("10x"));
 	string  s_scan = CT2A(scan.GetBuffer());
 	allfiles.scan10Xsolve = allfiles.filesolve + s_scan + "\\";
 	const char* c_scansolve = allfiles.scan10Xsolve.c_str();//将路径转换成 const char
 	_mkdir(c_scansolve);
 
 	//聚焦路径
-	CString pos(_T("CA位置"));
+	CString pos(_T("CA_pos"));
 	string  s_pos = CT2A(foc.GetBuffer());
 	allfiles.CApossolve = allfiles.filesolve + s_pos + "\\";
 	const char* c_possolve = allfiles.CApossolve.c_str();//将路径转换成 const char

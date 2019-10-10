@@ -90,6 +90,19 @@ public:
 	bool BuildOrNotMN = false;
 	bool BuildOrNotCHRO = false;
 
+
+	struct PatientAccessTable
+	{
+		CString PatientName; //病人名称
+		vector <CString>  ImgNames;//该病人的照片
+		CString  MicroProgress;//分析进度
+		CString PrintReady;//报表是否可以打印
+		MN_HandleResult *Result;
+		CString ImgPath; //分析图片路径
+		CString ResultPath; //结果存储路径
+
+	};
+
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -154,8 +167,8 @@ public:
 
 	//开辟的扫描线程执行函数
 	void static ScanThreadProc();
-
-
+	void deleteSlideSetTab();
+	void SlideToPatient();
 	afx_msg void OnBnClickedBtnCaptureimg();
 	afx_msg void OnBnClickedBtnReset();
 	afx_msg void OnBnClickedBtnParaset();

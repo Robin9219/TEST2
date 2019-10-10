@@ -78,14 +78,19 @@ BOOL CSlideSet::OnInitDialog()
 	m_path.SetWindowText(m_savepath);
 
 	//ÉèÖÃ±íÍ·
+	CRect rectCtrl;
+	CStatic *p = (CStatic*)GetDlgItem(IDC_LIST_SLIDE);
+	p->GetWindowRect(rectCtrl);
+	this->ScreenToClient(rectCtrl);
+
 	m_slidelist.SetExtendedStyle(LVS_EX_FLATSB | LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP | LVS_EX_ONECLICKACTIVATE | LVS_EX_GRIDLINES);
-	m_slidelist.InsertColumn(0, _T("ÐòºÅ"), LVCFMT_CENTER, 60, 0);
-	m_slidelist.InsertColumn(1, _T("ÐòºÅ"), LVCFMT_CENTER, 60, 0);
-	m_slidelist.InsertColumn(2, _T("Ñ¡Ôñ²£Æ¬"), LVCFMT_CENTER, 120, 0);
-	m_slidelist.InsertColumn(3, _T("²£Æ¬Ãû³Æ"), LVCFMT_CENTER, 160, 1);
-	m_slidelist.InsertColumn(4, _T("Ä£Ê½"), LVCFMT_CENTER, 90, 2);
-	m_slidelist.InsertColumn(5, _T("É¨Ãè·¶Î§£¨%£©"), LVCFMT_CENTER, 180, 3);
-	m_slidelist.InsertColumn(6, _T("±¸×¢"), LVCFMT_CENTER, 330, 4);
+	m_slidelist.InsertColumn(0, _T("ÐòºÅ"), LVCFMT_CENTER, rectCtrl.Width()*0.1, 0);
+	m_slidelist.InsertColumn(1, _T("ÐòºÅ"), LVCFMT_CENTER, rectCtrl.Width()*0.1, 0);
+	m_slidelist.InsertColumn(2, _T("Ñ¡Ôñ²£Æ¬"), LVCFMT_CENTER, rectCtrl.Width()*0.15, 0);
+	m_slidelist.InsertColumn(3, _T("²£Æ¬Ãû³Æ"), LVCFMT_CENTER, rectCtrl.Width()*0.20, 1);
+	m_slidelist.InsertColumn(4, _T("Ä£Ê½"), LVCFMT_CENTER, rectCtrl.Width()*0.1, 2);
+	m_slidelist.InsertColumn(5, _T("É¨Ãè·¶Î§£¨%£©"), LVCFMT_CENTER, rectCtrl.Width()*0.25, 3);
+	m_slidelist.InsertColumn(6, _T("±¸×¢"), LVCFMT_CENTER, rectCtrl.Width()*0.20, 4);
 	m_slidelist.DeleteColumn(0); //É¾³ýµÚ0ÁÐ
 
 	//ÉèÖÃÕýÎÄ

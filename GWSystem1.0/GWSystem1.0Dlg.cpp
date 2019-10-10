@@ -672,7 +672,12 @@ DWORD WINAPI ThreadProc(PVOID pParam)
 	m_Scanning_Control->m_FocusingImage_Save_Paras.csDiretory = focusPath;
 	//m_Scanning_Control->m_ScanningImage_Save_Paras.scan10XPath = scanPath;
 	//m_Scanning_Control->m_ScanningImage_Save_Paras.focusPath = posPath;
-
+	////使能电机
+	//m_Scanning_Control->s_Dev_Drivers->Dev_ENA(1, true);
+	//m_Scanning_Control->s_Dev_Drivers->Dev_ENA(2, true);
+	//m_Scanning_Control->s_Dev_Drivers->Dev_ENA(3, true);
+	//m_Scanning_Control->s_Dev_Drivers->Dev_PUSIRobot_ENA(4, true);
+	//m_Scanning_Control->s_Dev_Drivers->Dev_PUSIRobot_ENA(5, true);
 
 
 	CString windowname;
@@ -756,21 +761,30 @@ DWORD WINAPI ThreadProc(PVOID pParam)
 
 	}
 
-	//将所有待扫描的玻片信息存入数据库
+	
+	////1.删除原有玻片设置表
+	//pDlg->deleteSlideSetTab();
+
+	//2.将所有待扫描的玻片信息存入数据库
 	for (size_t i = 0; i < pDlg->Slide->All_Slide_ID.size(); i++)
 	{
 		//将一张玻片的扫描信息存入数据库
 		CReadAndWriteForAccess SaveToAccess;
-		Table_SlideSet slideset;
+		Table_SlideSet *slideset = new Table_SlideSet;
 		patientname = pDlg->Slide->slidebuild[i].name;
 		patientmode = pDlg->Slide->slidebuild[i].mode;
-		slideset.name = patientname;
-		slideset.mode = patientmode;
-		slideset.path = pDlg->AllFiles.picsolve.c_str();
-		slideset.resultpath = pDlg->AllFiles.endsolve.c_str();
-		slideset.range = pDlg->Slide->slidebuild[i].range;
+		slideset->name = patientname;
+		slideset->mode = patientmode;
+		slideset->path = pDlg->AllFiles.picsolve.c_str();
+		slideset->resultpath = pDlg->AllFiles.endsolve.c_str();
+		slideset->range = pDlg->Slide->slidebuild[i].range;
 		SaveToAccess.WriteToSlideSet(slideset);
 	}
+
+	//3.将玻片信息整理成病人信息，存入病人设置表
+
+
+
 
 	for (size_t i = 0; i < pDlg->Slide->All_Slide_ID.size(); i++)
 	{
@@ -790,13 +804,6 @@ DWORD WINAPI ThreadProc(PVOID pParam)
 		patientmode = pDlg->Slide->slidebuild[i].mode;
 		m_Scanning_Control->m_ScanningImage_Save_Paras.csFilename = patientname + "_" + patientmode + _T("_");
 		m_Scanning_Control->m_FocusingImage_Save_Paras.csFilename = patientname + "_" + patientmode + _T("_F");
-
-		//使能电机
-		m_Scanning_Control->s_Dev_Drivers->Dev_ENA(1, true);
-		m_Scanning_Control->s_Dev_Drivers->Dev_ENA(2, true);
-		m_Scanning_Control->s_Dev_Drivers->Dev_ENA(3, true);
-		m_Scanning_Control->s_Dev_Drivers->Dev_PUSIRobot_ENA(4, true);
-		m_Scanning_Control->s_Dev_Drivers->Dev_PUSIRobot_ENA(5, true);
 
 		if (patientmode == _T("微核"))
 		{
@@ -901,7 +908,7 @@ DWORD WINAPI ThreadProc(PVOID pParam)
 
 	////扫描完毕，关闭定时器1的刷新
 	//pDlg->KillTimer(1);
-
+	cout << "扫描线程结束！！！！" << endl;
 }
 
 //上一页的八张玻片
@@ -1120,7 +1127,7 @@ void CGWSystem10Dlg::OnBnClickedBtnStop()
 	// TODO:  在此添加控件通知处理程序代码
 	//断开扫描线程
 	TerminateThread(hThread, 0);
-	
+	Sleep(1000);
 	//停止电机
 	m_Scanning_Control->s_Dev_Drivers->Dev_ENA(1, false);
 	m_Scanning_Control->s_Dev_Drivers->Dev_ENA(2, false);
@@ -1248,5 +1255,130 @@ void CGWSystem10Dlg::ReSize()
 		hwndChild = ::GetWindow(hwndChild, GW_HWNDNEXT);
 	}
 	old = Newp;
+
+}
+
+void CGWSystem10Dlg::deleteSlideSetTab()
+{
+	sql = _T("delete  * from 玻片设置表");
+	try
+	{
+		m_Conn.GetRecordSet(sql);
+	}
+	catch (_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
+}
+
+
+void CGWSystem10Dlg::SlideToPatient()
+{
+	vector <CString>  AllMicroImg;//所有病人的微核照片
+	char tempFilePath[MAX_PATH + 1];
+	//char tempFileName[10000];
+	WCHAR   wstr[MAX_PATH];
+	WIN32_FIND_DATA file;
+	CString OneImgName;
+
+	//1.获得相应时间段内的玻片图片
+	CReadAndWriteForAccess xx;
+	vector<Table_SlideSet> ReadSlideset;
+	ReadSlideset = xx.QuerySlidesetMN();
+
+	//2.遍历每张拨片的路径，合并相同路径，得到路径集合数组
+	vector<CString>AllMNImgPath;
+	vector<CString>AllMNResPath;
+	vector<COleDateTime>AllMNTime;
+	for (auto iter : ReadSlideset)
+	{
+		vector<CString>::iterator ret;
+		ret = std::find(AllMNImgPath.begin(), AllMNImgPath.end(), iter.path);
+		if (ret == AllMNImgPath.end())
+		{
+			AllMNImgPath.push_back(iter.path);
+			AllMNResPath.push_back(iter.resultpath);
+			AllMNTime.push_back(iter.time);
+		}
+	}
+
+	//3.将路径集合数组里面的路径下的病人图片进行归类，显示到表格
+	for (size_t pathNum_i = 0; pathNum_i < AllMNImgPath.size(); pathNum_i++)
+	{
+		int picNum = 0;
+		vector<CString> vecEmpty;
+		AllMicroImg.swap(vecEmpty);//清空每一轮查找的图
+
+		//（1）筛选所有病人的微核图片，并放入结构体
+		USES_CONVERSION;
+		m_Scanning_Control->critical_section.Lock();
+		char* charReadPath = T2A(AllMNImgPath[pathNum_i]);
+		sprintf_s(tempFilePath, "%s\\*.bmp", charReadPath);
+		MultiByteToWideChar(CP_ACP, 0, tempFilePath, -1, wstr, sizeof(wstr));
+		HANDLE handle = FindFirstFile(wstr, &file);
+		if (handle != INVALID_HANDLE_VALUE)
+		{
+			// 循环遍历得到文件夹的所有文件名    
+			do
+			{
+				OneImgName = file.cFileName;
+				int iPos = OneImgName.Find(_T("_"));
+				CString str1 = OneImgName.Mid(iPos + 1, OneImgName.GetLength() - iPos - 1);
+				iPos = str1.Find(_T("_"));
+				str1 = str1.Left(iPos);
+				if (str1 == _T("微核"))
+					AllMicroImg.push_back(OneImgName);
+			} while (FindNextFile(handle, &file));
+		}
+		m_Scanning_Control->critical_section.Unlock();
+		FindClose(handle);
+
+		//(2)建立各个病人与图片的对应结构体
+		BOOL havepatientornot;
+		CString strDst;
+		vector <PatientAccessTable> tempMicroAllPatients;
+
+		for (auto iter : AllMicroImg)
+		{
+			picNum = 0;
+			havepatientornot = FALSE;
+
+			//获取照片名中的病人名
+			CString strDst1 = iter.Left(iter.Find(_T('（')));
+			CString strDst2 = iter.Left(iter.Find(_T('(')));
+			CString strDst3 = iter.Left(iter.Find(_T('_')));
+			if (strDst1.IsEmpty() && !strDst2.IsEmpty())
+				strDst = strDst2;
+			if (!strDst1.IsEmpty() && strDst2.IsEmpty())
+				strDst = strDst1;
+			if (strDst1.IsEmpty() && strDst2.IsEmpty())
+				strDst = strDst3;
+			for (auto iterpatient : tempMicroAllPatients)
+			{
+				if (iterpatient.PatientName == strDst)
+				{
+					havepatientornot = TRUE;
+					tempMicroAllPatients[picNum].ImgNames.push_back(iter);
+				}
+				picNum++;
+			}
+			if (!havepatientornot)//如果没有该病人
+			{
+				PatientAccessTable patient;
+				patient.PatientName = strDst;
+				patient.ImgNames.push_back(iter);
+				patient.ImgPath = AllMNImgPath[pathNum_i];
+				patient.ResultPath = AllMNResPath[pathNum_i];
+				tempMicroAllPatients.push_back(patient);
+			}
+
+		}
+
+		//（3）将病人名称与图片总数显示到表格
+
+	
+
+
+	}
 
 }

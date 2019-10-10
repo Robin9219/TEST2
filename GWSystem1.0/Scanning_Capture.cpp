@@ -14,7 +14,7 @@ Scanning_System_Para Scanning_Capture::s_Scanning_System_Para = { { -94000, 2310
 //当用40X进行聚焦的时候，搜索步长为：{ 600, 300, 200 }，新算法中，只有单步长聚焦，只用到了最后一位补偿（200）
 //当用10X进行聚焦的时候，搜索步长为：{ 2000, 1000, 800 }，新算法中，只有单步长聚焦，只用到了最后一位补偿（800）
 //17, 35
-User_Para Scanning_Capture::s_User_Para = { 8, 20, 40, 10, 20, 4, 6, true };//{ 8, 15, 25, 50, 80, 6, 9, true };//{ 8, 9, 9, 30, 30, 4, 4, true }
+User_Para Scanning_Capture::s_User_Para = { 8, 20, 40, 10, 20, 4, 6, true ,false};//{ 8, 15, 25, 50, 80, 6, 9, true };//{ 8, 9, 9, 30, 30, 4, 4, true }
 Scanning_10X_Para Scanning_Capture::s_Scanning_10X_Para = { 5, 8,15, 200 ,5};
 
 Scanning_Capture::Scanning_Capture()
@@ -402,25 +402,25 @@ int Scanning_Capture::Do_Scanning_intial()
 */
 int Scanning_Capture::Do_Resetting(int Motor_ID,bool fast_slow)
 {
-	s_Dev_Drivers->Dev_clear_alarm(1);//清楚警告
-	s_Dev_Drivers->Dev_clear_alarm(2);//清楚警告
-	s_Dev_Drivers->Dev_clear_alarm(3);//清楚警告
+	//s_Dev_Drivers->Dev_clear_alarm(1);//清楚警告
+	//s_Dev_Drivers->Dev_clear_alarm(2);//清楚警告
+	//s_Dev_Drivers->Dev_clear_alarm(3);//清楚警告
 
-	s_Dev_Drivers->Dev_clear_alarm(4);//清楚警告
-	s_Dev_Drivers->Dev_clear_alarm(5);//清楚警告
+	//s_Dev_Drivers->Dev_clear_alarm(4);//清楚警告
+	//s_Dev_Drivers->Dev_clear_alarm(5);//清楚警告
 
-	s_Dev_Drivers->Dev_heart_beat(1, FALSE);//关闭报文
-	s_Dev_Drivers->Dev_heart_beat(2, FALSE);//关闭报文
-	s_Dev_Drivers->Dev_heart_beat(3, FALSE);//关闭报文
-	s_Dev_Drivers->Dev_heart_beat(4, FALSE);//关闭报文
-	s_Dev_Drivers->Dev_heart_beat(5, FALSE);//关闭报文
-	s_Dev_Drivers->Dev_ENA(1, 1);//1号使能
-	s_Dev_Drivers->Dev_ENA(2, 1);//2号使能
-	s_Dev_Drivers->Dev_ENA(3, 1);//3号使能
-	s_Dev_Drivers->Dev_PUSIRobot_ENA(4, 0);//3号使能
-	s_Dev_Drivers->Dev_PUSIRobot_ENA(5, 0);//3号使能
-	//s_Dev_Drivers->Dev_ENA(4, 0);//3号使能
-	//s_Dev_Drivers->Dev_ENA(5, 1);//3号使能
+	//s_Dev_Drivers->Dev_heart_beat(1, FALSE);//关闭报文
+	//s_Dev_Drivers->Dev_heart_beat(2, FALSE);//关闭报文
+	//s_Dev_Drivers->Dev_heart_beat(3, FALSE);//关闭报文
+	//s_Dev_Drivers->Dev_heart_beat(4, FALSE);//关闭报文
+	//s_Dev_Drivers->Dev_heart_beat(5, FALSE);//关闭报文
+	//s_Dev_Drivers->Dev_ENA(1, 1);//1号使能
+	//s_Dev_Drivers->Dev_ENA(2, 1);//2号使能
+	//s_Dev_Drivers->Dev_ENA(3, 1);//3号使能
+	//s_Dev_Drivers->Dev_PUSIRobot_ENA(4, 0);//3号使能
+	//s_Dev_Drivers->Dev_PUSIRobot_ENA(5, 0);//3号使能
+	////s_Dev_Drivers->Dev_ENA(4, 0);//3号使能
+	////s_Dev_Drivers->Dev_ENA(5, 1);//3号使能
 
 	long lk;
 	vector<long>Home_offset;
@@ -487,7 +487,8 @@ int Scanning_Capture::Do_Resetting_Finished(int Motor_ID)
 	Dap_02 = (Dap_02 || (status_arr[1]));//20表示回零完成，4表示相对运动到位
 	if (Dap_01 & Dap_02)
 	{
-		if (Motor_ID == 4) s_Dev_Drivers->Dev_PUSIRobot_ENA(4, 0);
+		if (Motor_ID == 4) 
+			s_Dev_Drivers->Dev_PUSIRobot_ENA(4, 0);
 		return State_Finished;//检测到复位完成，给出下一步的状态，进入判断分支，关键分支
 	}
 	else
@@ -632,10 +633,12 @@ int Scanning_Capture::Do_Stepping(int Motor_ID,long Motor_Postion)
 	{
 		Num_Read++;
 		s_Dev_Drivers->Dev_Read_Status(Dev_id, status_arr, 1);
-		if (Num_Read > 1000)
+		if (Num_Read > 5000)
 		{
 			s_Dev_Drivers->CANET_Init("192.168.1.5", 5000);
+			Num_Read = 0;
 			Sleep(20);
+			cout << "s_Dev_Drivers->Dev_Read_Pos(3, Z_Pos1)" << endl;
 		}
 
 	}
@@ -687,6 +690,7 @@ int Scanning_Capture::Do_Stepping(int Motor_ID,long Motor_Postion)
 */
 int Scanning_Capture::Do_Stepping_Finished(int Motor_ID,long Move_to)
 {
+	long Current_Pos = 0;
 
 	if (m_Respond_Check_Num < 200)//进行驱动器返回报文
 	{
@@ -698,33 +702,28 @@ int Scanning_Capture::Do_Stepping_Finished(int Motor_ID,long Move_to)
 		{
 			m_Respond_Check_Num++;
 			return State_Freeze;
-		}
-		long Current_Pos = 0;
+		}		
 		bool Get_Pos_Move = s_Dev_Drivers->Dev_Read_Pos(Motor_ID, Current_Pos);
 		if (!Get_Pos_Move)
 			return State_Freeze;
-		if (Motor_ID == 1)
-			int jjjj = 0;
 		bool Move_In_Deviation = (Current_Pos >=(Move_to - s_Scanning_System_Para.Move_Deviation)) &&
 			(Current_Pos <= (Move_to + s_Scanning_System_Para.Move_Deviation));
-		Sleep(10);
-		long Current_Pos1 = 0;
-		Get_Pos_Move = s_Dev_Drivers->Dev_Read_Pos(Motor_ID, Current_Pos);
-		if (!Get_Pos_Move)
-			return State_Freeze;
-		if (Motor_ID == 1)
-			int jjjj = 0;
-		bool Move_In_Deviation1 = (Current_Pos >= (Move_to - s_Scanning_System_Para.Move_Deviation)) &&
-			(Current_Pos <= (Move_to + s_Scanning_System_Para.Move_Deviation));
+		//Sleep(10);
+		//long Current_Pos1 = 0;
+		//Get_Pos_Move = s_Dev_Drivers->Dev_Read_Pos(Motor_ID, Current_Pos);
+		//if (!Get_Pos_Move)
+		//	return State_Freeze;
 
-		if (Current_Pos == Current_Pos1)
-			m_Respond_Check_Num1++;
-		//s_Dev_Drivers->Dev_Read_Status(Dev_id, status_arr, 1);
-
-		if (Move_In_Deviation && status_arr[0] && Move_In_Deviation1)
+		//bool Move_In_Deviation1 = (Current_Pos >= (Move_to - s_Scanning_System_Para.Move_Deviation)) &&
+		//	(Current_Pos <= (Move_to + s_Scanning_System_Para.Move_Deviation));
+		//if (Current_Pos == Current_Pos1)
+		//	m_Respond_Check_Num1++;
+		////s_Dev_Drivers->Dev_Read_Status(Dev_id, status_arr, 1);
+		//if (Move_In_Deviation && status_arr[0] && Move_In_Deviation1)
+		if (Move_In_Deviation && status_arr[0])
 		{
 			m_Respond_Right = false;
-			if (s_Scanning_Para.Forcuing_OR_Scanning)
+			//if (s_Scanning_Para.Forcuing_OR_Scanning)
 				m_Respond_Check_Num = 0;
 			s_Dev_Drivers->Status_Ref = false;//******添加的运动完成标志位//
 			m_Respond_Check_Num1 = 0;
@@ -732,11 +731,23 @@ int Scanning_Capture::Do_Stepping_Finished(int Motor_ID,long Move_to)
 		}
 		else
 		{
-			if (status_arr[0] && (m_Respond_Check_Num > 20))
+			if (status_arr[0] && (m_Respond_Check_Num1 > 20))
 			{
 				int Dev_Status = -1;
+				int Comm_Nums = 0;
 				while (Dev_Status == -1)
+				{
+					if (Comm_Nums > 1000)
+					{
+						Comm_Nums = 0;					
+						s_Dev_Drivers->CANET_Init("192.168.1.5", 5000);
+						cout << "Dev_Read_InputIO_Status(3)" << endl;						
+					}
+					else
+						Comm_Nums++;
 					Dev_Status = s_Dev_Drivers->Dev_Read_InputIO_Status(3);
+					Sleep(20);
+				}
 				if (Dev_Status != Motor_Move_In_Range)
 				{
 					if (Motor_ID == 1) m_X_Moveto = Current_Pos;
@@ -749,22 +760,26 @@ int Scanning_Capture::Do_Stepping_Finished(int Motor_ID,long Move_to)
 			m_Respond_Check_Num++;
 			return State_Freeze;
 		}
-
-
 	}
 	else//如果超过了报文查询次数，还是没有查到上次指令发送后驱动器的响应报文，那么则重新执行上次指令
 	{
+		cout << "m_Respond_Check_Num " << m_Respond_Check_Num<<endl;
+		Sleep(200);
+
+		//如果超出设定的判定次数，但是当前读取位置正确，同时位置不相等，说明当前电机正常运行，不需要重新连接通讯
+		//long Current_Pos1 = 0;
+		//bool Get_Pos_Move = s_Dev_Drivers->Dev_Read_Pos(Motor_ID, Current_Pos);
+		//if ((Get_Pos_Move) && (Current_Pos1 != Current_Pos))
+		//	return State_Freeze;
+
 		m_Respond_Right = false;
 		m_Respond_Check_Num = 0;
-		
-		//if (m_Respond_Check_Num1 > 60)
-		//{
-		//重新建立连接 
 		m_Respond_Check_Num1 = 0;
-		s_Dev_Drivers->CANET_Init("192.168.1.5", 5000);
-		Sleep(20);
-		//}
 
+		//重新建立连接 
+		s_Dev_Drivers->CANET_Init("192.168.1.5", 5000);
+		cout << "Do_Stepping_Finished(int Motor_ID,long Move_to)" << endl;
+		Sleep(20);
 
 		return Stepping;
 		//cout << "重复东一次"<<endl;
@@ -907,7 +922,6 @@ int Scanning_Capture::Do_Save_Image()
 
 }
 
-
 /***************************************
 Move_To_Object:运动到对应的物镜
 int Object_Num:目标物镜编号，0号表示4倍镜
@@ -978,16 +992,15 @@ int Scanning_Capture::Do_Move_To_Object_Fininshed()
 }
 
 /********************************************************************************************************************************/
-
 /*扫描结束
 */
 bool Scanning_Capture::Do_Scanning_Finished()
 {
-	s_Dev_Drivers->Dev_ENA(1,0);//1号使能
-	s_Dev_Drivers->Dev_ENA(2, 0);//2号使能
-	s_Dev_Drivers->Dev_ENA(3, 0);//3号使能
-	s_Dev_Drivers->Dev_ENA(4, 0);//2号使能
-	s_Dev_Drivers->Dev_ENA(5, 0);//3号使能
+	//s_Dev_Drivers->Dev_ENA(1,0);//1号使能
+	//s_Dev_Drivers->Dev_ENA(2, 0);//2号使能
+	//s_Dev_Drivers->Dev_ENA(3, 0);//3号使能
+	//s_Dev_Drivers->Dev_ENA(4, 0);//2号使能
+	//s_Dev_Drivers->Dev_ENA(5, 0);//3号使能
 	return TRUE;
 }
 
@@ -1088,7 +1101,6 @@ int Scanning_Capture::Do_Focusing_Model()
 	return 1;
 }
 
-
 int Scanning_Capture::Do_restting_Model()
 {
 	int Back_Num;
@@ -1157,7 +1169,6 @@ int Scanning_Capture::Do_restting_Model()
 	//Do_Scanning_Finished();
 	return 1;
 }
-
 
 int Scanning_Capture::Do_Scanning_Model()
 {

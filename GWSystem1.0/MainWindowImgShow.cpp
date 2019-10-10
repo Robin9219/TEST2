@@ -318,7 +318,7 @@ void CMainWindowImgShow::TimerShowPicture()
 
 
 				image = imread(imgNames[i], 1);//读取图片
-				double scale = 0.15;
+				double scale = 0.1;//0.15
 				Size outsize;
 				Mat Resize;
 				outsize.height = image.rows*scale;

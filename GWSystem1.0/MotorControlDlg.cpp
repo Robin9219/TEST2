@@ -156,9 +156,10 @@ void MotorControlDlg::OnBnClickedBtnStopall()
 	MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_ENA(1, 0);
 	MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_ENA(2, 0);
 	MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_ENA(3, 0);
-	MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_ENA(4, 0);
-	MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_ENA(5, 0);
-
+	//MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_ENA(4, 0);
+	//MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_ENA(5, 0);
+	MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_PUSIRobot_ENA(4, 0);//3号使能
+	MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_PUSIRobot_ENA(5, 0);//3号使能
 }
 
 

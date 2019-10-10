@@ -43,6 +43,9 @@ using namespace cv;
 #define Z_MoveDown_Avoid_Finished 30   //转换镜头前预先下降完成
 #define Z_MoveDown_AvoidBack 31   //转换镜头前预先下降回升
 #define Z_MoveDown_AvoidBack_Finished 32   //转换镜头前预先下降回升完成
+#define Move_To_Current_Solide 33   //转换镜头前预先下降回升
+#define Move_To_Current_Solide_Finished 34   //转换镜头前预先下降回升完成
+
 
 #define Objective_4X 0 //物镜编号
 #define Objective_10X 1
@@ -104,7 +107,7 @@ struct User_Para
 	//int Focusing_Num_X; //X轴方向上聚焦的点数
 	//int Focusing_Num_Y; //Y轴方向上聚焦的点数
 	bool NewStart_OR_BreakPoint;//重新开始或断点开始
-
+	bool Stop_Scanning_RightNow;//主要用于在程序扫描过程中，如果当前扫描数量已经足够分析，那么停止分析
 	
 };
 //{8,15, 30, 50, 80, 5,8};
@@ -223,4 +226,3 @@ protected:
 	int m_Respond_Check_Num;//返回的报文相应的查询次数记录，相当于一个时钟；
 	int m_Respond_Check_Num1;//返回的报文相应的查询次数记录，相当于一个时钟；
 };
-

@@ -13,7 +13,7 @@ CReadAndWriteForAccess::~CReadAndWriteForAccess()
 }
 
 
-bool CReadAndWriteForAccess::WriteToSlideSet(Table_SlideSet slideset)
+bool CReadAndWriteForAccess::WriteToSlideSet(Table_SlideSet * slideset)
 {
 	sql = _T("select  * from 玻片设置表");
 	try
@@ -26,18 +26,18 @@ bool CReadAndWriteForAccess::WriteToSlideSet(Table_SlideSet slideset)
 	}
 	try
 	{
-		slideset.time = COleDateTime::GetCurrentTime();
+		slideset->time = COleDateTime::GetCurrentTime();
 
 		m_Conn.m_pRecordset->AddNew();
-		m_Conn.m_pRecordset->PutCollect(_T("已分析图片数"), _variant_t(slideset.ImgSolvedNum));
-		m_Conn.m_pRecordset->PutCollect(_T("总图片数"), _variant_t(slideset.AllImgNum));
-		m_Conn.m_pRecordset->PutCollect(_T("存图时间"), _variant_t(slideset.time));
-		m_Conn.m_pRecordset->PutCollect(_T("是否有分析"), _variant_t(slideset.HaveSolved));
-		m_Conn.m_pRecordset->PutCollect(_T("路径"), _variant_t(slideset.path));
-		m_Conn.m_pRecordset->PutCollect(_T("病人名称"), _variant_t(slideset.name));
-		m_Conn.m_pRecordset->PutCollect(_T("模式"), _variant_t(slideset.mode));
-		m_Conn.m_pRecordset->PutCollect(_T("扫描范围"), _variant_t(slideset.range));
-		m_Conn.m_pRecordset->PutCollect(_T("结果路径"), _variant_t(slideset.resultpath));
+		m_Conn.m_pRecordset->PutCollect(_T("已分析图片数"), _variant_t(slideset->ImgSolvedNum));
+		m_Conn.m_pRecordset->PutCollect(_T("总图片数"), _variant_t(slideset->AllImgNum));
+		m_Conn.m_pRecordset->PutCollect(_T("存图时间"), _variant_t(slideset->time));
+		m_Conn.m_pRecordset->PutCollect(_T("是否有分析"), _variant_t(slideset->HaveSolved));
+		m_Conn.m_pRecordset->PutCollect(_T("路径"), _variant_t(slideset->path));
+		m_Conn.m_pRecordset->PutCollect(_T("病人名称"), _variant_t(slideset->name));
+		m_Conn.m_pRecordset->PutCollect(_T("模式"), _variant_t(slideset->mode));
+		m_Conn.m_pRecordset->PutCollect(_T("扫描范围"), _variant_t(slideset->range));
+		m_Conn.m_pRecordset->PutCollect(_T("结果路径"), _variant_t(slideset->resultpath));
 
 
 		m_Conn.m_pRecordset->Update();
@@ -147,6 +147,90 @@ vector<Table_SlideSet> CReadAndWriteForAccess::QuerySaveTimeMN(COleDateTime begi
 	return SlideSetVector;
 }
 
+//查询玻片设置表
+vector<Table_SlideSet> CReadAndWriteForAccess::QuerySlidesetMN()
+{
+	vector<Table_SlideSet>SlideSetVector;
+	Table_SlideSet slideset;
+	CString mystr = _T("微核");
+	sql = _T("select  * from 玻片设置表 where 玻片设置表.[模式] = '" + mystr + "' ");
+	try
+	{
+		m_Conn.GetRecordSet(sql);
+	}
+	catch (_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
+	try
+	{
+		while (!m_Conn.m_pRecordset->adoEOF)
+		{
+			CString str = m_Conn.m_pRecordset->GetCollect(_T("路径"));
+			slideset.path = str;
+			str = m_Conn.m_pRecordset->GetCollect(_T("病人名称"));
+			slideset.name = str;
+			str = m_Conn.m_pRecordset->GetCollect(_T("结果路径"));
+			slideset.resultpath = str;
+			COleDateTime str2 = m_Conn.m_pRecordset->GetCollect(_T("存图时间"));
+			slideset.time = str2;
+			SlideSetVector.push_back(slideset);
+
+			m_Conn.m_pRecordset->MoveNext();
+		}
+
+	}
+	catch (_com_error e)
+	{
+		AfxMessageBox(e.Description());
+	}
+
+	return SlideSetVector;
+
+}
+
+//查询玻片设置表染色体模式
+vector<Table_SlideSet> CReadAndWriteForAccess::QuerySlidesetCHRO()
+{
+	vector<Table_SlideSet>SlideSetVector;
+	Table_SlideSet slideset;
+	CString mystr = _T("染色体");
+	sql = _T("select  * from 玻片设置表 where 玻片设置表.[模式] = '" + mystr + "' ");
+	try
+	{
+		m_Conn.GetRecordSet(sql);
+	}
+	catch (_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
+	try
+	{
+		while (!m_Conn.m_pRecordset->adoEOF)
+		{
+			CString str = m_Conn.m_pRecordset->GetCollect(_T("路径"));
+			slideset.path = str;
+			str = m_Conn.m_pRecordset->GetCollect(_T("病人名称"));
+			slideset.name = str;
+			str = m_Conn.m_pRecordset->GetCollect(_T("结果路径"));
+			slideset.resultpath = str;
+			str = m_Conn.m_pRecordset->GetCollect(_T("存图时间"));
+
+			COleDateTime str2 = m_Conn.m_pRecordset->GetCollect(_T("存图时间"));
+			slideset.time = str2;
+			SlideSetVector.push_back(slideset);
+
+			m_Conn.m_pRecordset->MoveNext();
+		}
+
+	}
+	catch (_com_error e)
+	{
+		AfxMessageBox(e.Description());
+	}
+
+	return SlideSetVector;
+}
 
 // 查询时间段内的图片-染色体模式
 vector<Table_SlideSet> CReadAndWriteForAccess::QuerySaveTimeCHRO(COleDateTime begintime, COleDateTime endtime)
@@ -551,7 +635,6 @@ vector<CHRO_HandleResult> CReadAndWriteForAccess::ReadAllResultFromAccess()
 		AfxMessageBox(e.Description());
 	}
 }
-
 
 
 // 将一张图片的分析结果存到数据库
@@ -1142,10 +1225,7 @@ bool CReadAndWriteForAccess::SaveToAccessMNAnalysis(MN_HandleResult * pb)
 		m_Conn.m_pRecordset->PutCollect(_T(">5MN in doublecell_校正"), _variant_t(pb->DoubleCellsWithMN[6] +
 			pb->DoubleCellsWithMN[7] + pb->DoubleCellsWithMN[8] + pb->DoubleCellsWithMN[9] + pb->DoubleCellsWithMN[10]));
 
-
-
 		m_Conn.m_pRecordset->Update();
-		//m_Conn.ExitConnect();
 	}
 	catch (_com_error e)
 	{

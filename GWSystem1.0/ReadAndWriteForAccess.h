@@ -21,13 +21,17 @@ public:
 
 public:
 
-	bool WriteToSlideSet(Table_SlideSet slideset);
+	bool WriteToSlideSet(Table_SlideSet *slideset);
 
 	vector<Table_SlideSet> ReadFromSlideSet();
 	// 查询时间段内的图片
 	vector<Table_SlideSet> QuerySaveTimeMN(COleDateTime begintime, COleDateTime endtime);
 
 	vector<Table_SlideSet> QuerySaveTimeCHRO(COleDateTime begintime, COleDateTime endtime);
+
+	vector<Table_SlideSet> QuerySlidesetMN();
+
+	vector<Table_SlideSet> QuerySlidesetCHRO();
 
 
 	// 数据库中读取一个病人的分析结果

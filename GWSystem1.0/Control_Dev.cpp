@@ -6,11 +6,28 @@
 #include <iostream>
 #include <vector>
 #include <windows.h>
+//#include <MSTCPiP.h>
 
 #pragma comment(lib, "ws2_32.lib")
 using namespace std;
 
 #include "Control_Dev.h"
+/****************************/
+//判断通讯是否断开
+/****************************/
+bool IsSocketClosed(SOCKET clientSocket)
+{
+	bool ret = false;
+	HANDLE closeEvent = WSACreateEvent();
+	WSAEventSelect(clientSocket, closeEvent, FD_CLOSE);
+	DWORD dwRet = WaitForSingleObject(closeEvent, 0);
+	if (dwRet == WSA_WAIT_EVENT_0)
+		ret = true;
+	else if (dwRet == WSA_WAIT_TIMEOUT)
+		ret = false;
+	WSACloseEvent(closeEvent);
+	return ret;
+}
 
 //************************************  
 // Method:    AsciiToByte 将ASCII字符转换为数字  
@@ -92,7 +109,9 @@ int Control_Dev::CANET_Init(char *Dev_addr, int Dev_port)
 {
 	closesocket(m_sockClient);
 	WSACleanup();
+	Sleep(100);
 
+	cout << "建立TCP连接！！！" << endl;
 
 	WORD wVersionRequested;
 	WSADATA wsaData;
@@ -298,6 +317,8 @@ int &iRLen：接受的报文长度，每条报文13个字符，返回值由多条报文组成。
 */
 int Control_Dev::Recv_message(char *pRecv, int &iRLen, int Timeout)
 {
+
+
 	int iRes = 0;
 	//ULONG iLen = (iRLen + 7) / 8 * 13;
 	int iLen = iRLen  / 13 * 13;
@@ -315,17 +336,15 @@ int Control_Dev::Recv_message(char *pRecv, int &iRLen, int Timeout)
 	iRes = recv(m_sockClient, pActvRecv, iLen, 0);
 	//iRes = recv(m_sockClient, pActvRecv, iLen, MSG_WAITALL);
 
-	Sleep(1);
+	Sleep(5);
 	/*******获取读取到的报文的长度********************/
 	int n = _mbslen((unsigned char*)pActvRecv);
 	/*************************************************/
-
 
 	//if (iRes == 0 || iRes == -1) //接收失败
 	//{
 	//	iRLen = 0;
 	//	delete[] pActvRecv;
-
 	//	if (m_sockClient != NULL)
 	//	{
 	//		closesocket(m_sockClient);
@@ -2110,12 +2129,16 @@ int Control_Dev::Dev_Home(vector<UINT> Dev_id, vector<long> Home_offset, bool St
 
 				if (fast_slow)
 				{
+					Send_command("23996001F0000000", F_id, 0, 0);//设置回零速度（search for switch）为1rps
 					//Send_command("2399600158020000", F_id, 0, 0);//设置回零速度（search for zero）为2.5rps
 					////Sleep(30);
 					//Send_command("2399600278000000", F_id, 0, 0);//设置回零速度（search for zero）为0.5rps
+					Send_command("2399600248000000", F_id, 0, 0);//设置回零速度（search for zero）为0.3rps
 					//Send_command("2399600160090000", F_id, 0, 0);//设置回零速度（search for switch）为10rps
-					Send_command("23996001B0040000", F_id, 0, 0);//设置回零速度（search for switch）为5rps
-					Send_command("2399600258020000", F_id, 0, 0);//设置回零速度（search for zero）为2.5rps
+					//Send_command("2399600178000000", F_id, 0, 0);//设置回零速度（search for switch）为0.5rps
+					//Send_command("23996001B0040000", F_id, 0, 0);//设置回零速度（search for switch）为5rps
+					//Send_command("2399600258020000", F_id, 0, 0);//设置回零速度（search for zero）为2.5rps
+					
 				}
 				else
 				{

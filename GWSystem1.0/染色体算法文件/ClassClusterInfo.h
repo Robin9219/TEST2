@@ -1,12 +1,11 @@
 #pragma once
-
+//#include "stdafx.h"
 #include"iostream"
 #include"iterator"
 #include"algorithm"
 #include"opencv2/core/core.hpp"
 #include"opencv2/highgui/highgui.hpp"
 #include"opencv2/imgproc/imgproc.hpp"
-#include <opencv2/video/video.hpp>
 using namespace std;
 using namespace cv;
 
@@ -18,8 +17,8 @@ public:
 	ClassClusterInfo();
 	//设定函数
 	void SetClassClusterInfo(Mat img);
-	void SetClassClusterInfo(Mat img,Rect UrRect);
-	void SetClassClusterInfo(Mat img,Rect UrRect,Point RelativeOrigin);
+	void SetClassClusterInfo(Mat img, Rect UrRect);
+	void SetClassClusterInfo(Mat img, Rect UrRect, Point RelativeOrigin);
 	//设定并获取CentromereLocationVector
 	void SetCentromereLocationVector(vector<Point> CLV);
 	void SetCentromereLocationVector(Point CL);
@@ -67,6 +66,6 @@ private:
 	//着丝粒点的位置
 	vector<Point> CentromereLocationVector; //是否需要深copy，后续考虑
 	//畸变标志，1为畸变，0为正常。默认为正常
-	int AberrationFlage=0;
-	
+	int AberrationFlage = 0;
+
 };

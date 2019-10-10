@@ -45,8 +45,8 @@ public:
 	void   distinguish(string pathName1, string fileName2, string  pathName2, string fileName3);
 
 	//处理主函数
-	MN_HandleResult* handlemicronucleus(string road1name1, string file1name1, string writename, CString patientname,
-		MN_HandleResult *pB, int analysenum, int Imgsum);
+	MN_HandleResult* handlemicronucleus(vector<string>ImgWaitingForAna,  string writename, CString patientname,
+		MN_HandleResult *pB);
 
 	void readImgNamefromFile(char* fileName, vector <string> &imgNames);
 

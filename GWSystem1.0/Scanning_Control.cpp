@@ -31,7 +31,6 @@ double Thenengrad(Mat &img)
 	return Grad_value / (img.cols - 2) / (img.rows - 2);
 }
 
-
 //输入必须是二值图，
 double Cut_ROI_Compute_Focus(Mat Intput_Image, vector<vector<Point>> contours, unsigned int Compute_Operator, bool Masked_Img = false)
 {
@@ -99,7 +98,6 @@ double Cut_ROI_Compute_Focus(Mat Intput_Image, vector<vector<Point>> contours, u
 	return Whole_Focus_Value;
 
 }
-
 
 // 获取大轮廓的区域
 vector<vector<Point>> getSizeContours(vector<vector<Point>> &contours, unsigned int &Max_Aero)
@@ -1434,16 +1432,28 @@ int Scanning_Control::Do_restting_Model()
 {
 
 	Handlehold_Thread_Running = false;
-	s_Dev_Drivers->Dev_ENA(1, true);
-	s_Dev_Drivers->Dev_ENA(2, true);
-	s_Dev_Drivers->Dev_ENA(3, true);
 
 	s_Dev_Drivers->Dev_Single_Mov_Para(1);
 	s_Dev_Drivers->Dev_Single_Mov_Para(2);
 	s_Dev_Drivers->Dev_Single_Mov_Para(3);
-
 	//s_Dev_Drivers->Dev_Single_Mov_Para(4);
 	//s_Dev_Drivers->Dev_Single_Mov_Para(5);
+	s_Dev_Drivers->Dev_clear_alarm(1);//清楚警告
+	s_Dev_Drivers->Dev_clear_alarm(2);//清楚警告
+	s_Dev_Drivers->Dev_clear_alarm(3);//清楚警告
+	//s_Dev_Drivers->Dev_clear_alarm(4);//清楚警告
+	//s_Dev_Drivers->Dev_clear_alarm(5);//清楚警告
+
+	s_Dev_Drivers->Dev_heart_beat(1, FALSE);//关闭报文
+	s_Dev_Drivers->Dev_heart_beat(2, FALSE);//关闭报文
+	s_Dev_Drivers->Dev_heart_beat(3, FALSE);//关闭报文
+	//s_Dev_Drivers->Dev_heart_beat(4, FALSE);//关闭报文
+	//s_Dev_Drivers->Dev_heart_beat(5, FALSE);//关闭报文
+	s_Dev_Drivers->Dev_ENA(1, 1);//1号使能
+	s_Dev_Drivers->Dev_ENA(2, 1);//2号使能
+	s_Dev_Drivers->Dev_ENA(3, 1);//3号使能
+	s_Dev_Drivers->Dev_PUSIRobot_ENA(4, 0);//3号使能
+	s_Dev_Drivers->Dev_PUSIRobot_ENA(5, 0);//3号使能
 
 	int Back_Num;
 	int states = Scanning_intial;
@@ -1456,20 +1466,20 @@ int Scanning_Control::Do_restting_Model()
 			if (Back_Num == State_Finished)
 			{
 				//内部直接增加的Z轴预先下降一定高度，避免物镜复位时，发生干涉
-				//s_Dev_Drivers->Dev_Single_Mov(3, s_Scanning_System_Para.Switch_Objective_ZPos, 3, false);
-				////s_Dev_Drivers->Dev_Single_Mov(3, 10000, 3, false);
-				//Sleep(200);
-				//vector<bool> status_arr = { 0 };
-				//int k = 1;
-				////while ((k < 1000) && (!status_arr[0]))
-				//while (!status_arr[0])
-				//{
-				//	vector<UINT> Dev_id = { 0 };
-				//	Dev_id[0] = { 3 };
-				//	s_Dev_Drivers->Dev_Read_Status(Dev_id, status_arr, 1);
-				//	Sleep(20);
-				//	//k++;
-				//}
+				s_Dev_Drivers->Dev_Single_Mov(3, s_Scanning_System_Para.Switch_Objective_ZPos, 5, false);
+				//s_Dev_Drivers->Dev_Single_Mov(3, 10000, 3, false);
+				Sleep(200);
+				vector<bool> status_arr = { 0 };
+				int k = 1;
+				//while ((k < 1000) && (!status_arr[0]))
+				while (!status_arr[0])
+				{
+					vector<UINT> Dev_id = { 0 };
+					Dev_id[0] = { 3 };
+					s_Dev_Drivers->Dev_Read_Status(Dev_id, status_arr, 1);
+					Sleep(200);
+					//k++;
+				}
 				states = Resetting_Table;
 			}
 					
@@ -1498,22 +1508,26 @@ int Scanning_Control::Do_restting_Model()
 			Back_Num = Do_Resetting_Finished(1);
 			if (Back_Num == State_Finished)//State_Finished 表示查询到完成状态
 			{
-				s_Dev_Drivers->Dev_ENA(3, 0);
+				//s_Dev_Drivers->Dev_ENA(3, 0);
 				states = Resetting_Z;
 			}
 			if (Back_Num == State_Freeze)//State_Freeze表示本次查询没有查询到完成状态
 				states = Resetting_X_Y_Finished;
 			break;
 		case Resetting_Z:
-			//Back_Num = Do_Resetting(3, true);//快速复位
-			states = Resetting_Z_Again_Finished;
+			Back_Num = Do_Resetting(3, true);//快速复位
+			//states = Resetting_Z_Again_Finished;
+			states = Resetting_Z_Finished;
 			break;
 		case Resetting_Z_Finished:
-			//Back_Num = Do_Resetting_Finished(3);
-			Back_Num = Resetting_Z_Again_Finished;
+			Back_Num = Do_Resetting_Finished(3);
+			//Back_Num = Resetting_Z_Again_Finished;
 			if (Back_Num == State_Finished)
-				states = Resetting_Z_Again;
-			if (Back_Num == State_Freeze)
+			{
+				states = Resetting_Z_Again_Finished;
+				//states = Resetting_Z_Again;
+			}
+			else
 				states = Resetting_Z_Finished;
 			break;
 		case Resetting_Z_Again:
@@ -1528,7 +1542,7 @@ int Scanning_Control::Do_restting_Model()
 				m_X_Moveto = 0;
 				m_Y_Moveto = 0;
 				m_Z_Moveto = 0;
-				s_Dev_Drivers->Dev_Set_Zero_Postion(3);
+				//s_Dev_Drivers->Dev_Set_Zero_Postion(3);
 				states = Scanning_Finished;
 			}
 					
@@ -1597,6 +1611,13 @@ int Scanning_Control::Do_Scanning_Model()
 	int Back_State2 = State_Freeze;
 	while (states != Scanning_Finished)
 	{
+		//如果触发停止扫描的变量，那么扫描会通过程序终止本张波片的聚焦，
+		if (s_User_Para.Stop_Scanning_RightNow)
+		{
+			states = Scanning_Finished;
+
+		}
+
 		switch (states)
 		{
 			//******运动到本次扫描/聚焦需要用到的物镜******//
@@ -1839,8 +1860,18 @@ int Scanning_Control::Do_Focusing_Model(int Focusing_Step)
 	Focusing_Search_Num = 0;
 	Focus_Values_Max_Index = 0;
 	long Z_Pos1;
+	int Communication_Nums = 0;
 	while (!s_Dev_Drivers->Dev_Read_Pos(3, Z_Pos1))
 	{
+		if (Communication_Nums > 5000)
+		{
+			Communication_Nums = 0;
+			s_Dev_Drivers->CANET_Init("192.168.1.5", 5000);
+			cout << "s_Dev_Drivers->Dev_Read_Pos(3, Z_Pos1)" << endl;
+			
+		}
+		else
+			Communication_Nums++;
 		Sleep(50);
 	}
 
@@ -1891,9 +1922,18 @@ int Scanning_Control::Do_Focusing_Model(int Focusing_Step)
 	clock_t start_c = clock();
 	clock_t Stop_c = clock();
 	int Focus_Level_100X = 0;
-	int jjjj = 0;
+	bool Back_Right1 = false;
+	bool Back_Right2 = false;
+	int Back_Num1 = State_Freeze;
 	while (states != Scanning_Finished)
 	{
+		//如果触发停止扫描的变量，那么扫描会通过程序终止本张波片的聚焦，
+		if (s_User_Para.Stop_Scanning_RightNow)
+		{
+			states = Scanning_Finished;
+
+		}
+
 		switch (states)
 		{
 			//******运动到本次扫描/聚焦需要用到的物镜******//
@@ -1928,10 +1968,53 @@ int Scanning_Control::Do_Focusing_Model(int Focusing_Step)
 			{
 				//m_Z_Moveto = m_Z_Moveto - s_Scanning_System_Para.Switch_Objective_ZPos;
 				m_Z_Moveto = 0;
-				states = Z_MoveDown_AvoidBack;
+				states = Move_To_Current_Solide;
 			}
 			if (Back_Num == State_Freeze)//State_Freeze表示本次查询没有查询到完成状态
 				states = Move_To_Object_Fininshed;
+			break;
+		case Move_To_Current_Solide:
+			m_Y_Moveto = 0;
+			m_X_Moveto = -s_Scanning_Para.Current_Slide_Num *(s_Scanning_System_Para.Slide_Size_X
+				+ s_Scanning_System_Para.Space_Slides)*s_Scanning_System_Para.Pulse_ratio;
+			Back_Num = Do_Stepping(1, m_X_Moveto);
+			Back_Num = Do_Stepping(2, m_Y_Moveto);
+			states = Move_To_Current_Solide_Finished;
+			break;
+		case Move_To_Current_Solide_Finished:
+			if (!Back_Right1)
+			{
+				Back_Num = Do_Stepping_Finished(1, m_X_Moveto);
+				if (Back_Num == State_Finished)
+					Back_Right1 = true;
+				else
+					Back_Right1 = false;
+			}
+
+			if (!Back_Right2)
+			{
+				Back_Num1 = Do_Stepping_Finished(2, m_Z_Moveto);
+				if (Back_Num1 == State_Finished)
+					Back_Right2 = true;
+				else
+					Back_Right2 = false;
+			}
+
+			if (Back_Right1 && Back_Right2)
+			{
+				Back_Right1 = false;
+				Back_Right2 = false;
+				states = Z_MoveDown_AvoidBack;
+			}
+			else if ((Back_Num == Stepping) || (Back_Num1 == Stepping))
+			{
+				Back_Num = State_Freeze;
+				Back_Num1 = State_Freeze;
+				states = Move_To_Current_Solide;
+			}
+
+			else
+				states = Move_To_Current_Solide_Finished;
 			break;
 		case Z_MoveDown_AvoidBack:				
 			Back_Num = Do_Stepping(3, m_Z_Moveto);
@@ -2085,8 +2168,6 @@ int Scanning_Control::Do_Focusing_Model(int Focusing_Step)
 			//	break;
 			//}
 			start_c = clock();
-
-			jjjj = m_Z_Moveto;
 
 			Back_Num = Do_Stepping(3, m_Z_Moveto);
 			states = Z_Stepping_Finished;
@@ -3338,14 +3419,14 @@ UINT Scanning_Control::Handlehold_ThreadFunc(LPVOID Handlehold_ThreadArg)//LPVOI
 		}
 		else
 			X_V_Model_Speed = X_Dic * pow((double)(X_real_Analog_New - Scanning_Control_Handlehold->s_Scanning_System_Para.Handle_Zero_X), 2) 
-			* 0.00000031;//4000 * 5
+			* 0.00000015;//4000 * 5, 0.00000031
 		if (abs(Y_real_Analog_New - Scanning_Control_Handlehold->s_Zero_Pos_Y)>3200)
 		{
 			Y_V_Model_Speed = Y_Dic * 10;
 		}
 		else
 			Y_V_Model_Speed = Y_Dic * pow((double)(Y_real_Analog_New - Scanning_Control_Handlehold->s_Scanning_System_Para.Handle_Zero_Y), 2)
-			* 0.00000031;
+			* 0.00000015;
 		if (Y_Get && X_Get)
 		{
 			if (X_Moved && Y_Moved)
@@ -3596,7 +3677,6 @@ UINT Scanning_Control::Get_CA_Pos_10X_ThreadFunc(LPVOID CA_10X_ThreadArg)
 		clock_t start_c = clock();
 		clock_t Stop_c = clock();
 
-
 		int Otsu_Threshold = threshold(gray, Bi, 0, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU);
 		//**注意，如果或的二值图是白底黑目标区域的，就必须将图边界增加几个像素，否则后面的轮廓提取会把整体图片的边界也
 		//作为是一个轮廓，这个轮廓会包含于边界相连通的所有区域***
@@ -3640,6 +3720,7 @@ UINT Scanning_Control::Get_CA_Pos_10X_ThreadFunc(LPVOID CA_10X_ThreadArg)
 		Mat mask_contour = Mat::zeros(Bi.size(), CV_8U);//同原图一样大小，纯黑的mask图像//CV_8UC3
 		Mat draw_contour = Mat::zeros(Bi.size(), CV_8U);//将原图copyTo到draw上，加上mask操作
 		Mat temp = Mat::zeros(Bi_contour.size(), CV_8U);//每次循环，重置mask和draw
+
 		for (int i = 0; i < contours.size(); i++)//遍历每个轮廓
 		{
 			//Scalar color((rand() & 255), (rand() & 255), (rand() & 255));//随机产生颜色 rand()产生随机数
@@ -3669,11 +3750,15 @@ UINT Scanning_Control::Get_CA_Pos_10X_ThreadFunc(LPVOID CA_10X_ThreadArg)
 				//int CA_row = boundRect.y + boundRect.height / 2;
 				//int CA_col = boundRect.x + boundRect.width / 2;
 				//当前目标位置的实际脉冲位置
-				int CA_Pos_X = (Bi.cols / 2 - center.x)*Get_CA_PosThreadFunc.s_Scanning_System_Para.View_Field_Width_10X / Bi.cols
-					+ Get_CA_PosThreadFunc.s_Scanning_Para.X_Scanning_Location[Focus_CA_10X_Num - 1];// +s_Scanning_System_Para.CA_XPos_Compensate;
-				int CA_Pos_Y = (Bi.rows / 2 - center.y)*Get_CA_PosThreadFunc.s_Scanning_System_Para.View_Field_Higth_10X / Bi.rows
-					+ Get_CA_PosThreadFunc.s_Scanning_Para.Y_Scanning_Location[Focus_CA_10X_Num - 1];// +s_Scanning_System_Para.CA_YPos_Compensate;
+				int  CA_Pos_X = (Bi.cols / 2 - center.x)*Get_CA_PosThreadFunc.s_Scanning_System_Para.View_Field_Width_10X / Bi.cols
+					+ Get_CA_PosThreadFunc.s_Scanning_Para.X_Scanning_Location[Focus_CA_10X_Num - 1] +s_Scanning_System_Para.CA_XPos_Compensate;
+				int  CA_Pos_Y = (Bi.rows / 2 - center.y)*Get_CA_PosThreadFunc.s_Scanning_System_Para.View_Field_Higth_10X / Bi.rows
+					+ Get_CA_PosThreadFunc.s_Scanning_Para.Y_Scanning_Location[Focus_CA_10X_Num - 1] +s_Scanning_System_Para.CA_YPos_Compensate;
 				Get_CA_PosThreadFunc.s_Scanning_Para.CA_Pos_10X.push_back(Point(CA_Pos_X, CA_Pos_Y));
+				cout << "Focus_CA_10X_Num - 1 X  " << Focus_CA_10X_Num - 1 << " :  " << CA_Pos_X << endl;
+				cout << "Focus_CA_10X_Num - 1 Y  " << Focus_CA_10X_Num - 1 << " :  " << CA_Pos_Y << endl;
+				//cout << "CA_XPos_Compensate  " << s_Scanning_System_Para.CA_XPos_Compensate << endl;
+				//cout << "CA_YPos_Compensate  " << s_Scanning_System_Para.CA_YPos_Compensate << endl;
 			}
 				
 			//gray.at<uchar>(center.y, center.x) = 0;
@@ -3725,7 +3810,7 @@ UINT Scanning_Control::Get_CA_Pos_10X_ThreadFunc(LPVOID CA_10X_ThreadArg)
 		///*critical_section.Lock();*/
 		string p2 = to_string(Get_CA_PosThreadFunc.s_Scanning_Para.Current_Slide_Num);
 		string p = to_string(Focus_CA_10X_Num);
-		string p_road = "D:\CA_10X_Pos\\CA_Pos_" + p2 + p + ".bmp";
+		string p_road = "F:\\10X定位图\\1\\CA_Pos_" + p2 + p + ".bmp";
 		cv::imwrite(p_road, Img);
 		/*critical_section.Unlock();*/
 		//Sleep(10);
@@ -3899,13 +3984,35 @@ int Scanning_Control::Do_Focusing_100X()
 
 	long Z_Pos1, Z_Pos2;
 	bool Read_Righ = true;
+	int Communicate_Nums = 0;
+	int Communicate_Nums1 = 0;
 	while (Read_Righ)
 	{
 		while (!s_Dev_Drivers->Dev_Read_Pos(3, Z_Pos1))
+		{
+			if (Communicate_Nums > 1000)
+			{
+				Communicate_Nums = 0;
+				s_Dev_Drivers->CANET_Init("192.168.1.5", 5000);
+				cout << "!s_Dev_Drivers->Dev_Read_Pos(3, Z_Pos1)" << endl;
+			}
+			else
+				Communicate_Nums++;
 			Sleep(50);
+		}
 		Sleep(1000);
 		while (!s_Dev_Drivers->Dev_Read_Pos(3, Z_Pos2))
+		{
+			if (Communicate_Nums1 > 1000)
+			{
+				Communicate_Nums = 0;
+				s_Dev_Drivers->CANET_Init("192.168.1.5", 5000);
+				cout << "!s_Dev_Drivers->Dev_Read_Pos(2, Z_Pos2)" << endl;
+			}
+			else
+				Communicate_Nums1++;
 			Sleep(50);
+		}
 		if (Z_Pos2 == Z_Pos1)
 			Read_Righ = false;
 	}
@@ -3988,6 +4095,13 @@ int Scanning_Control::Do_Focusing_100X()
 	Mat Focus_Pic, Focus_Pic1, OutGray;
 	while (states != Scanning_Finished)
 	{
+		//如果触发停止扫描的变量，那么扫描会通过程序终止本张波片的聚焦，
+		if (s_User_Para.Stop_Scanning_RightNow)
+		{
+			states = Scanning_Finished;
+
+		}
+
 		switch (states)
 		{
 		case Z_MoveDown_Avoid:
@@ -4352,6 +4466,14 @@ int Scanning_Control::Do_Find_Focus_Level_100X_Climb(int Focus_LevelSearch_Step_
 	int states = Z_MoveDown_Avoid;
 	while (states != Scanning_Finished)
 	{
+
+		//如果触发停止扫描的变量，那么扫描会通过程序终止本张波片的聚焦，
+		if (s_User_Para.Stop_Scanning_RightNow)
+		{
+			states = Scanning_Finished;
+
+		}
+
 		switch (states)
 		{
 		case Z_MoveDown_Avoid:
@@ -4513,6 +4635,8 @@ int Scanning_Control::Do_Find_Focus_Level_100X_Climb(int Focus_LevelSearch_Step_
 				while (Back_Num != State_Finished)
 				{
 					Back_Num = Do_Stepping_Finished(3, m_Z_Moveto);
+					if (Back_Num == Stepping)
+						Do_Stepping(3, m_Z_Moveto);
 				}
 
 
@@ -4637,6 +4761,13 @@ int Scanning_Control::Do_Find_Focus_Level_100X(int Focus_LevelSearch_Step_Z, int
 	bool Back_True2 = false;
 	while (states != Scanning_Finished)
 	{
+		//如果触发停止扫描的变量，那么扫描会通过程序终止本张波片的聚焦，
+		if (s_User_Para.Stop_Scanning_RightNow)
+		{
+			states = Scanning_Finished;
+
+		}
+
 		switch (states)
 		{
 		case Z_MoveDown_Avoid:
@@ -4667,6 +4798,8 @@ int Scanning_Control::Do_Find_Focus_Level_100X(int Focus_LevelSearch_Step_Z, int
 				while (Back_Num != State_Finished)
 				{
 					Back_Num = Do_Stepping_Finished(3, m_Z_Moveto);
+					if (Back_Num == Stepping)
+						Do_Stepping(3, m_Z_Moveto);
 				}
 				states = Scanning_Finished;
 			}
@@ -4931,9 +5064,18 @@ int Scanning_Control::Pump_Oil_100X_Func()
 				//{
 				//}
 				vector<bool> status_arr = { 0 };
+				int Communicate_Nums = 0;
 				while (!status_arr[0])
 				{
+					if (Communicate_Nums>1000)
+					{
+						Communicate_Nums = 0;
+						s_Dev_Drivers->CANET_Init("192.168.1.5", 5000);
+						cout << "s_Dev_Drivers->Dev_PUSIRobot_Read_Status({ 5 }, status_arr, 1)" << endl;
+					}
+					Communicate_Nums++;
 					s_Dev_Drivers->Dev_PUSIRobot_Read_Status({ 5 }, status_arr, 1);
+
 				}
 				Sleep(3000);//等待1s时间使得油滴落下
 				s_Dev_Drivers->Dev_PUSIRobot_ENA(5, false);
@@ -5104,7 +5246,6 @@ bool Scanning_Control::Set_Camera_Paras(unsigned int Objective_Num)
 	}
 	return true;
 }
-
 int Scanning_Control::DrawCurrentPosition(S_LOCATION currrentLocation)
 {
 	CString windowname;

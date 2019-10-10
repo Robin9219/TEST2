@@ -254,6 +254,14 @@ void CMicroNucleusHandle::OnBnClickedBtnMicrohandle()
 	//清空本次分析的数据库
 	GetDlgItem(IDC_BTN_MICROHANDLE)->EnableWindow(FALSE);//无lisr选项选中使删除按钮变灰
 
+	// 删除已经存在的分析文件
+	string wholefilename = "E:\\tmp\\321\\tNMresult.txt";
+	WCHAR   wstr[MAX_PATH];
+	char sucTempFilePath[MAX_PATH + 1];
+	sprintf_s(sucTempFilePath, "%s", wholefilename.c_str());
+	MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
+	DeleteFile(wstr);
+
 	//1.获取所选中的病人数组，加入AllPatientsChose
 	int nItem, i;
 	nItem = m_listmicrohandle.GetItemCount();
@@ -331,48 +339,97 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 
 		size_t newStart = 0;
 		int deletedPicNum = 0;
+		int alalysedNum = 0;
+		vector<string>ImgWaitingForAna;
+
 
 		while (pHandleDlg->patientNewImg)//判断该病人是否有新的图片加入
 		{
-			for (size_t j = newStart; j < pHandleDlg->AllPatientsChose[i].MicroImgNames.size(); j++)
+			//Sleep(1000);
+			string readpath = CT2A(pHandleDlg->AllPatientsChose[i].ImgPath.GetBuffer());
+			bool loopover = false;
+			while (!loopover)
 			{
-				string readpath = CT2A(pHandleDlg->AllPatientsChose[i].ImgPath.GetBuffer());
-				string imgname = CT2A(pHandleDlg->AllPatientsChose[i].MicroImgNames[j].GetBuffer());
-				
-
-				string picpath = readpath + "\\" + imgname;
-				Mat image = imread(picpath);//37 38 40 43 44 45
-				if (image.empty())
+				if (pHandleDlg->AllPatientsChose[i].MicroImgNames.size() - alalysedNum > 10 &&
+					pHandleDlg->AllPatientsChose[i].MicroImgNames.size() - alalysedNum < analysenum)
 				{
-					j--;
-					Sleep(100);
-					continue;
+					for (size_t k = alalysedNum; k < pHandleDlg->AllPatientsChose[i].MicroImgNames.size(); k++)
+					{
+
+						string imgname = CT2A(pHandleDlg->AllPatientsChose[i].MicroImgNames[k].GetBuffer());
+						string read1name1 = readpath + imgname;//读取的总路径
+						ImgWaitingForAna.push_back(read1name1);
+
+						//int currentImgNum = ImgWaitingForAna.size();
+						//cout << "已分析数 +待分析数：" << currentImgNum << "     ";
+						//cout << "图片总数：" << MicroImgNames.size() << endl;
+						//cout << "ImgWaitingForAna[i]" << ImgWaitingForAna[i];
+
+						CString mystr1, mystr2;
+						mystr1.Format(_T("%d"),k + 1);
+						mystr2 = mystr1 + _T("/") + mystr;
+
+						HWND   hwnd = ::FindWindow(NULL, _T("微核处理"));//调用消息处理函数刷新页面
+						::SendMessage(hwnd, WM_INIT_TABLEMN, (WPARAM)mystr2.AllocSysString(), (WPARAM)row);//线程中传递定时器消息，以开启定时器，刷新显示照片
+
+					}
+
+					pHandleDlg->AllPatientsChose[i].Result =
+						algorithm.handlemicronucleus(ImgWaitingForAna,  StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName,pB);
+					pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
+					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].MicroImgNames.size() + 1;
+					pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
+					pHandleDlg->AllPatientsChose[i].Result->resultfile = pHandleDlg->AllPatientsChose[i].ResultPath;
+
+					alalysedNum += ImgWaitingForAna.size();
+					vector<string>().swap(ImgWaitingForAna);
+				}
+				else if (pHandleDlg->AllPatientsChose[i].MicroImgNames.size() - alalysedNum >= analysenum)
+				{
+
+						for (size_t k = alalysedNum; k < alalysedNum + analysenum; k++)
+						{
+
+							string imgname = CT2A(pHandleDlg->AllPatientsChose[i].MicroImgNames[k].GetBuffer());
+							string read1name1 = readpath + imgname;//读取的总路径
+							ImgWaitingForAna.push_back(read1name1);
+
+							//int currentImgNum = ImgWaitingForAna.size();
+							//cout << "已分析数 +待分析数：" << currentImgNum << "     ";
+							//cout << "图片总数：" << MicroImgNames.size() << endl;
+							//cout << "ImgWaitingForAna[i]" << ImgWaitingForAna[i];
+
+							CString mystr1, mystr2;
+							mystr1.Format(_T("%d"), k + 1);
+							mystr2 = mystr1 + _T("/") + mystr;
+
+							HWND   hwnd = ::FindWindow(NULL, _T("微核处理"));//调用消息处理函数刷新页面
+							::SendMessage(hwnd, WM_INIT_TABLEMN, (WPARAM)mystr2.AllocSysString(), (WPARAM)row);//线程中传递定时器消息，以开启定时器，刷新显示照片
+						}
+
+						pHandleDlg->AllPatientsChose[i].Result =
+						algorithm.handlemicronucleus(ImgWaitingForAna, StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName, pB);
+						pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
+						pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].MicroImgNames.size() + 1;
+						pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
+						pHandleDlg->AllPatientsChose[i].Result->resultfile = pHandleDlg->AllPatientsChose[i].ResultPath;
+
+						alalysedNum += ImgWaitingForAna.size();
+						vector<string>().swap(ImgWaitingForAna);
+
+					}
+
+				if (alalysedNum <pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
+				{
+					loopover = false;
+				}
+				else
+				{
+					loopover = true;
 				}
 
-				////处理过程文件堆放的文件夹
-				//pHandleDlg->strFileProcess = StrFileSolve + "过程文件\\";
-				//const char* c_fileprocess = pHandleDlg->strFileProcess.c_str();//将路径转换成 const char
-				//_mkdir(c_fileprocess);
-
-				pHandleDlg->AllPatientsChose[i].Result =
-					algorithm.handlemicronucleus(readpath, imgname, StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName,
-					pB, analysenum, pHandleDlg->AllPatientsChose[i].MicroImgNames.size());
-				pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
-				pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].MicroImgNames.size() + 1;
-				pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
-				pHandleDlg->AllPatientsChose[i].Result->resultfile = pHandleDlg->AllPatientsChose[i].ResultPath;
-
-				//删除处理过程文件堆放的文件夹
-				CFileOperate x;
-				/*x.DeleteFolder(A2W((pHandleDlg->strFileProcess).c_str()));*/
-
-				CString mystr1, mystr2;
-				mystr1.Format(_T("%d"), j + 1);
-				mystr2 = mystr1 + _T("/") + mystr;
-
-				HWND   hwnd = ::FindWindow(NULL, _T("微核处理"));//调用消息处理函数刷新页面
-				::SendMessage(hwnd, WM_INIT_TABLEMN, (WPARAM)mystr2.AllocSysString(), (WPARAM)row);//线程中传递定时器消息，以开启定时器，刷新显示照片
 			}
+
 
 			//查询该病人的图片是否在增加
 			vector<CString>patientNewImgPath = pHandleDlg->InquiryPatientImg(pHandleDlg->AllPatientsChose[i].PatientName, pHandleDlg->AllPatientsChose[i].ImgPath);
@@ -412,11 +469,9 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 
 					}
 
-
 				}
 				else
 					pHandleDlg->patientNewImg = false;
-
 
 				//判断当前分析病人的文件夹是否和扫描文件夹相同
 
