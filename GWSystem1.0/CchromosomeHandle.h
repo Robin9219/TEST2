@@ -115,4 +115,5 @@ public:
 	bool LoadCurrentToList();
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	afx_msg void OnNMClickListResultchro(NMHDR *pNMHDR, LRESULT *pResult);
+	CEdit m_analysenumchro;
 };

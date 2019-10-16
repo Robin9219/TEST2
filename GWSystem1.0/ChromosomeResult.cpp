@@ -461,7 +461,7 @@ void CChromosomeResult::ReadThePicResult(CString picpath)
 	try
 	{
 		CString str;
-		str = m_Conn.m_pRecordset->GetCollect(_T("系统判定的双着体条数"));
+		str = m_Conn.m_pRecordset->GetCollect(_T("dic"));
 		m_dic.SetWindowTextW(str);
 		str = m_Conn.m_pRecordset->GetCollect(_T("系统判定的染色体环数"));
 		m_round.SetWindowTextW(str);
@@ -486,7 +486,7 @@ void CChromosomeResult::ReadThePicResult(CString picpath)
 		str = m_Conn.m_pRecordset->GetCollect(_T("cte"));
 		m_cte.SetWindowTextW(str);
 
-		var = m_Conn.m_pRecordset->GetCollect(_T("人工校对的双着体条数"));
+		var = m_Conn.m_pRecordset->GetCollect(_T("dic_check"));
 		if (var.vt != VT_NULL)
 			m_dicrg.SetWindowTextW((_bstr_t)var);
 		else
@@ -751,7 +751,7 @@ void CChromosomeResult::OnBnClickedBtnChload2lib()
 		UpdateData(FALSE);
 		p = (CEdit*)GetDlgItem(IDC_EDIT_DICRG);
 		p->GetWindowTextW(mystr);
-		m_Conn.m_pRecordset->PutCollect(_T("人工校对的双着体条数"), _variant_t(mystr));
+		m_Conn.m_pRecordset->PutCollect(_T("dic_check"), _variant_t(mystr));
 
 		p = (CEdit*)GetDlgItem(IDC_EDIT_ROUNDRG);
 		p->GetWindowTextW(mystr);
@@ -846,7 +846,7 @@ void CChromosomeResult::OnBnClickedBtnChload2lib()
 //			CString mystr;
 //			while (!m_Conn.m_pRecordset->adoEOF)
 //			{
-//				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的双着体条数"));
+//				mystr = m_Conn.m_pRecordset->GetCollect(_T("dic_check"));
 //				amendpA.dic += _ttoi(mystr);
 //				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的着丝粒环数"));
 //				amendpA.round += _ttoi(mystr);
@@ -881,7 +881,7 @@ void CChromosomeResult::OnBnClickedBtnChload2lib()
 //		try
 //		{
 //			//将对应的玻片编号和照片序数存入数组，用于报表生成
-//			m_Conn.m_pRecordset->PutCollect(_T("人工校对的双着体条数"), _variant_t(amendpA.dic));
+//			m_Conn.m_pRecordset->PutCollect(_T("dic_check"), _variant_t(amendpA.dic));
 //			m_Conn.m_pRecordset->PutCollect(_T("人工校对的着丝粒环数"), _variant_t(amendpA.round));
 //			m_Conn.m_pRecordset->PutCollect(_T("人工校对的无着丝体数"), _variant_t(amendpA.ace));
 //			m_Conn.m_pRecordset->PutCollect(_T("人工校对的相互易位数"), _variant_t(amendpA.t));
@@ -954,7 +954,7 @@ void CChromosomeResult::CountTheSumFromAcces(CString patientname)
 
 			if (equal)
 			{
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的双着体条数"));
+				mystr = m_Conn.m_pRecordset->GetCollect(_T("dic_check"));
 				allAbnormalNum += _ttoi(mystr);
 				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的着丝粒环数"));
 				allAbnormalNum += _ttoi(mystr);
@@ -991,7 +991,7 @@ void CChromosomeResult::CountTheSumFromAcces(CString patientname)
 
 			if (equal&& qua_unq == "1")
 			{
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的双着体条数"));
+				mystr = m_Conn.m_pRecordset->GetCollect(_T("dic_check"));
 				Sum_Dic = _ttoi(mystr) + Sum_Dic;
 				allAbnormalNum += _ttoi(mystr);
 				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的着丝粒环数"));
@@ -1137,7 +1137,7 @@ void CChromosomeResult::OnBnClickedBtnCheckoverchro()
 			if (quaornot == 1)
 			{
 				CString mystr;
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的双着体条数"));
+				mystr = m_Conn.m_pRecordset->GetCollect(_T("dic_check"));
 				amendpA.dic += _ttoi(mystr);
 				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的着丝粒环数"));
 				amendpA.round += _ttoi(mystr);
@@ -1412,7 +1412,7 @@ vector<CHRO_HandleResultOnePic>CChromosomeResult::GetOnePatientImgInformation(CS
 				onepic.patientname = name;
 				onepic.picpath = m_Conn.m_pRecordset->GetCollect(_T("照片路径"));
 
-				onepic.dic = m_Conn.m_pRecordset->GetCollect(_T("系统判定的双着体条数"));
+				onepic.dic = m_Conn.m_pRecordset->GetCollect(_T("dic"));
 				onepic.round = m_Conn.m_pRecordset->GetCollect(_T("系统判定的染色体环数"));
 				onepic.ace = m_Conn.m_pRecordset->GetCollect(_T("系统判定的无着丝体数"));
 				onepic.t = m_Conn.m_pRecordset->GetCollect(_T("系统判定的相互易位数"));
@@ -1444,7 +1444,7 @@ vector<CHRO_HandleResultOnePic>CChromosomeResult::GetOnePatientImgInformation(CS
 				//onepic.QuaOrNot = m_Conn.m_pRecordset->GetCollect(_T("QuaOrNot"));
 
 
-				var = m_Conn.m_pRecordset->GetCollect(_T("人工校对的双着体条数"));
+				var = m_Conn.m_pRecordset->GetCollect(_T("dic_check"));
 				if (var.vt != VT_NULL)
 					onepic.dic_rg = _ttoi((_bstr_t)var);
 				else

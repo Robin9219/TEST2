@@ -45,6 +45,8 @@ using std::string;
 #define  WM_START_HANDOPERATION WM_USER+121
 #define  WM_CURRENTPOSITION WM_USER+122
 
+
+
 class CGWSystem10App : public CWinApp
 {
 public:
@@ -225,6 +227,8 @@ struct CHRO_HandleResultOnePic//染色体分析结果数据记录结构体
 	int ctb_rg = 0;
 	int cte_rg = 0;
 
+	vector<string>LastResult;
+
 	int chromosome_num = 0;
 	int chromosome_num_check = 0;
 	int QuaOrNot = 0;  //0 为未校正  1为合格 -1为不合格
@@ -363,4 +367,12 @@ struct PatientWithSlide
 	CString mode;
 
 };
+
+//目前，调用的exe中，每张大图分割出的小图最大数量为56，
+const int Max_splitImgNum = 56;
+
+string CStringtoString(CString cs);
+
+CString stringtoCString(string str);
+
 extern CGWSystem10App theApp;

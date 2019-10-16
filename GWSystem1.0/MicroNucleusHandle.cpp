@@ -419,9 +419,15 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 
 					}
 
+				//判断已分析的双核细胞数是否达到2000
+				int ImgNum = ReadAndWriteMN.CountDoubleCell(pHandleDlg->AllPatientsChose[i].PatientName);
+				/*cout << "ImgNum: " << ImgNum;*/
 				if (alalysedNum <pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
 				{
-					loopover = false;
+					if (ImgNum>2000)
+						loopover = true;
+					else
+						loopover = false;
 				}
 				else
 				{
@@ -626,15 +632,15 @@ void CMicroNucleusHandle::DeleteAccessTable()
 {
 	_bstr_t sql;
 	_variant_t var;
-	sql = _T("delete  * from 微核图像分析结果数据表");
-	try
-	{
-		m_Conn.GetRecordSet(sql);
-	}
-	catch (_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
+	//sql = _T("delete  * from 微核图像分析结果数据表");
+	//try
+	//{
+	//	m_Conn.GetRecordSet(sql);
+	//}
+	//catch (_com_error *e)
+	//{
+	//	AfxMessageBox(e->ErrorMessage());
+	//}
 
 	sql = _T("delete  * from 微核图像分析结果数据表（已删除）");
 	try

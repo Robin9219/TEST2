@@ -1,4 +1,5 @@
 #pragma once
 //#include "stdafx.h"
 
-int CNNpredict(vector<cv::Mat> imgvec, vector<int>& ResultFlage);
+int CNNpredict(string savefilepath);
+//int CNNpredict(vector<cv::Mat> imgvec, vector<int>& ResultFlage);

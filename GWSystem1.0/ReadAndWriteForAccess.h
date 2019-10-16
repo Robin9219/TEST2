@@ -66,6 +66,15 @@ public:
 
 	// 一个病人的微核分析结果保存到数据库--分析时
 	bool SaveToAccessMNAnalysis(MN_HandleResult * pb);
+
+	//统计双核细胞分析数量是否达到2000张
+	int CountDoubleCell(CString patientname);
+
+	//统计染色体分析数量是否达到200张
+	int CountChromosome(CString patientname);
+
+	//从数据库中统计一张大图的分析结果
+	bool CountResultFromBigImg(CString patientname);
 };
 
 

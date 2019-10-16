@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ReadAndWriteForAccess.h"
-
+#include<iostream>
 
 CReadAndWriteForAccess::CReadAndWriteForAccess()
 {
@@ -385,7 +385,7 @@ void CReadAndWriteForAccess::SaveOnePicResult(CHRO_HandleResultOnePic resultstru
 		m_Conn.m_pRecordset->PutCollect(_T("正常细胞数"), _variant_t(resultstruct.normalcell));
 		m_Conn.m_pRecordset->PutCollect(_T("不正常细胞数"), _variant_t(resultstruct.abnormal));
 		m_Conn.m_pRecordset->PutCollect(_T("总细胞数"), _variant_t(resultstruct.allcell));
-		m_Conn.m_pRecordset->PutCollect(_T("系统判定的双着体条数"), _variant_t(resultstruct.dic));
+		m_Conn.m_pRecordset->PutCollect(_T("dic"), _variant_t(resultstruct.dic));
 		m_Conn.m_pRecordset->PutCollect(_T("系统判定的染色体环数"), _variant_t(resultstruct.round));
 		m_Conn.m_pRecordset->PutCollect(_T("系统判定的无着丝体数"), _variant_t(resultstruct.ace));
 		m_Conn.m_pRecordset->PutCollect(_T("系统判定的相互易位数"), _variant_t(resultstruct.t));
@@ -409,7 +409,7 @@ void CReadAndWriteForAccess::SaveOnePicResult(CHRO_HandleResultOnePic resultstru
 
 
 
-		m_Conn.m_pRecordset->PutCollect(_T("人工校对的双着体条数"), _variant_t(resultstruct.dic));
+		m_Conn.m_pRecordset->PutCollect(_T("dic_check"), _variant_t(resultstruct.dic));
 		m_Conn.m_pRecordset->PutCollect(_T("人工校对的着丝粒环数"), _variant_t(resultstruct.round));
 		m_Conn.m_pRecordset->PutCollect(_T("人工校对的无着丝体数"), _variant_t(resultstruct.ace));
 		m_Conn.m_pRecordset->PutCollect(_T("人工校对的相互易位数"), _variant_t(resultstruct.t));
@@ -420,6 +420,23 @@ void CReadAndWriteForAccess::SaveOnePicResult(CHRO_HandleResultOnePic resultstru
 		m_Conn.m_pRecordset->PutCollect(_T("chromosome_num_check"), _variant_t(resultstruct.chromosome_num));
 		m_Conn.m_pRecordset->PutCollect(_T("QuaOrNot"), _variant_t(resultstruct.QuaOrNot));
 		m_Conn.m_pRecordset->PutCollect(_T("CheckPath"), _variant_t(resultstruct.CheckPath));
+
+		//保存各个小染色体信息
+		vector<CString> RST;
+		for (size_t i = 0; i < Max_splitImgNum; i++)
+		{
+			CString number;
+			number.Format(_T("%d"), i);
+			CString rst = _T("rst") + number;
+			USES_CONVERSION; 
+			CString str(resultstruct.LastResult[i].c_str());
+			if (!resultstruct.LastResult[i].empty())
+			{
+				m_Conn.m_pRecordset->PutCollect(_variant_t(rst), _variant_t(str));
+			}
+		}
+		
+
 
 		m_Conn.m_pRecordset->Update();
 		//m_Conn.ExitConnect();
@@ -1007,6 +1024,7 @@ MN_HandleResult CReadAndWriteForAccess::ReadOneMNSystemResultFromAccess(CString 
 
 	return pA;
 }
+
 // 数据库中搜索当前病人的处理结果
 vector<MN_HandleResultOnePic> CReadAndWriteForAccess::FindCurrentPatientResult(CString patientname)
 {
@@ -1355,3 +1373,130 @@ bool CReadAndWriteForAccess::SaveToAccessMNAnalysis(MN_HandleResult * pb)
 //	}
 //
 //}
+
+//统计双核细胞分析数量是否达到2000张
+int CReadAndWriteForAccess::CountDoubleCell(CString patientname)
+{
+	_bstr_t sql;
+	_variant_t var;
+	int imgnum = 0;
+	sql = _T("select * from 微核图像分析结果数据表\
+			 			 			 			 			 	 where 微核图像分析结果数据表.[病人名称]='" + patientname + "' ");
+	try
+	{
+		m_Conn.GetRecordSet(sql);
+	}
+	catch (_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
+	try
+	{
+		m_Conn.m_pRecordset->MoveFirst();
+		
+		while (!m_Conn.m_pRecordset->adoEOF)
+		{
+			imgnum++;		
+			m_Conn.m_pRecordset->MoveNext();
+		}
+	}
+	catch (_com_error e)
+	{
+		AfxMessageBox(e.Description());
+	}
+	return imgnum;
+}
+
+//统计染色体分析数量是否达到200张
+int CReadAndWriteForAccess::CountChromosome(CString patientname)
+{
+	_bstr_t sql;
+	_variant_t var;
+	int imgnum = 0;
+	sql = _T("select * from 染色体图像分析结果数据表\
+			 			 			 			  where 染色体图像分析结果数据表.[所属病人或代号]='" + patientname + "' ");
+	
+	try
+	{
+		m_Conn.GetRecordSet(sql);
+	}
+	catch (_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
+	try
+	{
+		m_Conn.m_pRecordset->MoveFirst();
+
+		while (!m_Conn.m_pRecordset->adoEOF)
+		{
+			imgnum++;
+			m_Conn.m_pRecordset->MoveNext();
+		}
+	}
+	catch (_com_error e)
+	{
+		AfxMessageBox(e.Description());
+	}
+	return imgnum;
+}
+
+//从数据库中统计一个病人每张大图的分析结果
+bool CReadAndWriteForAccess::CountResultFromBigImg(CString patientname)
+{
+	_bstr_t sql;
+	_variant_t var;
+	sql = _T("select * from 染色体图像分析结果数据表\
+			 			 			 			 			  where 染色体图像分析结果数据表.[所属病人或代号]='" + patientname + "' ");
+
+	try
+	{
+		m_Conn.GetRecordSet(sql);
+	}
+	catch (_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
+	try
+	{
+
+		m_Conn.m_pRecordset->MoveFirst();
+
+		while (!m_Conn.m_pRecordset->adoEOF)
+		{
+			//统计每一行中的双着畸变数量
+			CString mystr;
+			string str;
+			int AbNum = 0;
+			for (size_t i = 0; i < Max_splitImgNum; i++)
+			{
+				CString number;
+				number.Format(_T("%d"), i);
+				CString rst = _T("rst") +number;
+				mystr = m_Conn.m_pRecordset->GetCollect((_variant_t)rst);
+				str = CStringtoString(mystr);
+
+				//发现#，表示搜索结束
+				if (str.find("#") !=string::npos) break;
+				int n = str.find("@");
+				str = str.substr(n +1, string::npos);
+				std::cout << "str: " << str << std::endl;
+				if (str == "0")//"0"是双着
+				{
+					AbNum++;
+				}
+			}
+			std::cout << AbNum << "\n";
+			//将统计出的畸变数存入数据库
+			m_Conn.m_pRecordset->PutCollect(_T("dic"), _variant_t(AbNum));
+			m_Conn.m_pRecordset->PutCollect(_T("dic_check"), _variant_t(AbNum));
+
+
+			m_Conn.m_pRecordset->MoveNext();
+		}
+	}
+	catch (_com_error e)
+	{
+		AfxMessageBox(e.Description());
+	}
+}

@@ -1,39 +1,58 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
+#include"Python.h"
 #include "ChromosomeAlgorithm.h"
 #include"ReadAndWriteForAccess.h"
-//È¾É«ÌåÊ¶±ğ
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\Int_to_String.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\BoolSort.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\MyFunction.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\ClassClusterInfo.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\InterestRegion.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\CutFirst.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\DrawClassChromInfoVector.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\ClassifyChromo.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\CutSecond.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\res.h"
-//Ê¶±ğ×ÅË¿Á£µãÎ»ÖÃ
-#include"×ÅË¿Á£µãÊ¶±ğ\LocateCentromere.h"
-//È¥ÔÓÖÊ
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\HSVRemoveImpurity.h"
-//¼ìÑéÓÃ
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\DrawClassChromInfoVector.h"
-//ÅÅĞò
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\Count.h"
+//æŸ“è‰²ä½“è¯†åˆ«
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\Int_to_String.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\BoolSort.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\MyFunction.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\ClassClusterInfo.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\InterestRegion.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\CutFirst.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\DrawClassChromInfoVector.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\ClassifyChromo.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\CutSecond.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\res.h"
+//è¯†åˆ«ç€ä¸ç²’ç‚¹ä½ç½®
+#include"ç€ä¸ç²’ç‚¹è¯†åˆ«\LocateCentromere.h"
+//å»æ‚è´¨
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\HSVRemoveImpurity.h"
+//æ£€éªŒç”¨
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\DrawClassChromInfoVector.h"
+//æ’åº
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\Count.h"
 
 //CNN
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\normalizeImgSizeCNN.h"
-#include"È¾É«ÌåËã·¨ÎÄ¼ş\CNNpredict.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\normalizeImgSizeCNN.h"
+#include"æŸ“è‰²ä½“ç®—æ³•æ–‡ä»¶\CNNpredict.h"
 
 #include <io.h>
 #include "direct.h"
+
+#include<iostream>
+#include<fstream>
+#include<string>
+
 #define PI 3.1415926
 
-////CNNÊ¶±ğÍ¼Ïñ³ß´ç
+////CNNè¯†åˆ«å›¾åƒå°ºå¯¸
 int CNN_IMG_SIZE = 40;
+
+
 
 vector<long>time1;
 CReadAndWriteForAccess ReadCHRO;
+
+inline string cutsplitImgName(string s);
+inline int cutsplitImgOrder(string s);
+bool split_cmp(string s1, string s2);
+inline string cutName(string s);
+bool imgName_cmp(string s1, string s2);
+//string result[40000];
+//string result_name[20000];
+//string result_num[20000];
+
+using namespace std;
 
 CChromosomeAlgorithm::CChromosomeAlgorithm()
 {
@@ -46,379 +65,280 @@ CChromosomeAlgorithm::~CChromosomeAlgorithm()
 }
 
 
-// //È¾É«Ìå·ÖÎöÖ÷º¯Êı
-CHRO_HandleResult* CChromosomeAlgorithm::DicMain(string road1name1, string file1name1, string writename, CString patientname, CHRO_HandleResult* pB)
+// //æŸ“è‰²ä½“åˆ†æä¸»å‡½æ•°
+CHRO_HandleResult* CChromosomeAlgorithm::DicMain(vector<string>ImgWaitingForAna, string writename, CString patientname,
+	CHRO_HandleResult *pB)
 {
-	//½«¸ÃÕÕÆ¬µÄ·ÖÎö½á¹û³õÊ¼»¯
-	OnePicResult.dic = 0;
-	OnePicResult.ace = 0;//
-	OnePicResult.allcell = 0;//
-	OnePicResult.inv = 0;//
-	OnePicResult.round = 0;//
-	OnePicResult.t = 0;//
-	OnePicResult.picpath = (writename + file1name1).c_str();//
-	OnePicResult.patientname = patientname;
 
-	OnePicResult.tri = 0;//
-	OnePicResult.ten = 0;//
-	OnePicResult.del = 0;
-	OnePicResult.ctg = 0;
-	OnePicResult.csg = 0;
-	OnePicResult.ctb = 0;
-	OnePicResult.cte = 0;
-
-	OnePicResult.abnormal = 0;
-	OnePicResult.normalcell = 0;
-	OnePicResult.CheckPath = "0";
-
-	string picpath = road1name1 +"\\"+ file1name1;
-
-	Mat image = imread(picpath);
-	//¶ÁÈ¡Í¼ÏñÎª¿ÕÊ±£¬Ö±½ÓÌø¹ı£¬¼´·µ»Ø£»
-	if (image.empty())
+	FILE *fp = NULL;
+	fp = fopen("C:\\Users\\xibao\\Desktop\\rst.txt", "w");
+	for (size_t i = 0; i < ImgWaitingForAna.size(); i++)
 	{
-		return pB;
+		string enter = "\n";
+		string oneImgpath = ImgWaitingForAna[i] + enter;
+		fprintf(fp, oneImgpath.c_str());
+		cout << "read1name1:" << ImgWaitingForAna[i] << endl;
+		//è½¬æ¢åçš„æ–‡ä»¶æ ¼å¼
+		//int pos0_3 = ImgWaitingForAna[i].rfind("_"); //, s_file_path.length()
+		//string fn1_2 = ImgWaitingForAna[i].substr(pos0_3 + 1, ImgWaitingForAna[i].length());//è¯»å–è·¯å¾„æœ€åçš„æ–‡ä»¶å,ä»…ä¿ç•™æ•°å­—åå­—ï¼Œä¸è¦ä¸­æ–‡
+		//string filename = "t" + fn1_2 + ".txt";
+		//ImgFormatConvert.push_back(filename);
+	}
+	fclose(fp);
+
+	//åˆ é™¤å·²æœ‰åˆ†æç»“æœçš„txtï¼Œé¿å…ä¸‹æ¬¡è®¤å®šé”™è¯¯
+	string wholefilename = "C:\\Users\\xibao\\Desktop\\rstResult.txt";
+
+	WCHAR   wstr[MAX_PATH];
+	char sucTempFilePath[MAX_PATH + 1];
+	sprintf_s(sucTempFilePath, "%s", wholefilename.c_str());
+	MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
+	DeleteFile(wstr);
+
+	//è°ƒç”¨åˆ†æè½¯ä»¶.exe
+	//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "â€ªE:\\GWsystem\\111vector_predict\\x64\\Release", NULL, NULL, SW_SHOW);
+	HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseMTF\\mtf20191009.exe", NULL, NULL, SW_SHOW);
+	if ((int)hNewExe == ERROR_FILE_NOT_FOUND)
+	{
+		std::cout << "æŒ‡å®šå·¥ä½œç›®å½•ï¼šæ–‡ä»¶æ‰¾ä¸åˆ°" << std::endl;
 	}
 
-	//·Ö¸î³ö¸ĞĞËÈ¤ÇøÓò
-	//*******************************************************************************************************
-
-	double Sscale = 0.1;//Ëõ·Å±¶Êı
-	vector<ClassClusterInfo> InterestCluster;
-	InterestRegion(image, Sscale, InterestCluster);
-	//sort(InterestCluster,SortClassClusterInfoLess_S);
-	//for(int i=0;i<InterestCluster.size();i++)
-	//{
-	//	imwrite(filename+"rr//"+imgname+"."+Int_to_String(i)+imgformat,InterestCluster[i].GetClusterImage());
-	//	//cout<<"¸ĞĞËÈ¤£º"<<Location[i].GetLabel()<<"\t"<<i<<"\n";
-	//}
-
-	//*******************************************************************************************************
-	//¶ÔÃ¿¸öÇøÓò½øĞĞ³õ²½ÇĞ¸îFirstCut
-	//*******************************************************************************************************
-	CutFirst(InterestCluster);
-
-	//Mat ICimg=Mat::zeros(image.size(),CV_8UC3);
-	//DrawClassChromInfoVector(InterestCluster,ICimg);
-	//imwrite(filename+"rr//"+imgname+"_"+"ICimg"+imgformat,ICimg);
-	//cout<<CutFirstLocation.size()<<"\n";
-	//for(int i=0;i<CutFirstLocation.size();i++)
-	//cout<<CutFirstLocation[i].GetRelativeOrigin()<<"\n";
-	//for(int i=0;i<InterestCluster.size();i++)
-	//{
-	//	imwrite(filename+"rr//ri//ra//"+imgname+"."+Int_to_String(i)+imgformat,InterestCluster[i].GetClusterImage());
-	////	cout<<CutFirstLocation[i].GetLabel()<<"\t"<<i<<"\n";
-	//}
-	//
-	//
-	////»ñÈ¡È¾É«ÌåĞÅÏ¢,²¢È¥³ı²¿·ÖÔÓÖÊ
-	//vector<ClassChromInfo> CutFirstClusterInfo=GetClassChromInfo(CutFirstCluster,CutFirstLocation);
-	//cout<<CutFirstClusterInfo.size()<<"\t"<<CutFirstCluster.size()<<"\n";
-	////for(int i=0;i<CutFirstClusterInfo.size();i++)
-	////{
-	////	cout<<CutFirstClusterInfo[i].GetWidth()<<"\t"<<CutFirstClusterInfo[i].GetAreaRatio()<<"\t"<<CutFirstClusterInfo[i].GetLabel()<<"\n";
-	////}
-
-	//*******************************************************************************************************
-	//·ÖÀà£¬·Ö³öÒÉËÆ¶ÏÆ¬¼°µ¥×ÅË¿Á£È¾É«»·£¬Õ³Á¬È¾É«Ìå¼°½Ï´óÔÓÖÊ£¬µ¥¸öÈ¾É«Ìå,²¢È¥³ı²¿·ÖÔÓÖÊ
-	//*******************************************************************************************************
-	vector<ClassClusterInfo> LumpInfo, SingleInfo, TinyInfo;
-	ClassifyChromo(InterestCluster, LumpInfo, SingleInfo, TinyInfo);
-	//////¼ìÑé·ÖÀà½á¹û£¬»­²ÊÍ¼
-	//Mat SFCS=Mat::zeros(image.size(),CV_8UC3);
-	//DrawClassChromInfoVector(SingleInfo,SFCS);
-	//imwrite(filename+"rr//"+imgname+"."+"SFCS"+imgformat,SFCS);
-	//Mat SFCL=Mat::zeros(image.size(),CV_8UC3);
-	//DrawClassChromInfoVector(LumpInfo,SFCL);
-	//imwrite(filename+"rr//"+imgname+"."+"SFCL"+imgformat,SFCL);
-	//Mat SFCT=Mat::zeros(image.size(),CV_8UC3);
-	//DrawClassChromInfoVector(TinyInfo,SFCT);
-	//imwrite(filename+"rr//"+imgname+"."+"SFCT"+imgformat,SFCT);
-
-	////½øÒ»²½¾«È·È¾É«Ìå¿í¶È·¶Î§
-	//sort(SingleInfo,SortClassClusterInfoLess_S);
-	//for(int i=0;i<SingleInfo.size();i++)
-	//	cout<<i<<"\t"<<SingleInfo[i].GetminRectShort()<<"\n";
-	//½«É¸Ñ¡³öÀ´µÄ½Ï´óÈ¾É«Ìå½øĞĞ¶ş´Î·Ö¸î,´Ë´¦¸Ä±äCutFirstCluster£¬LumpInfo, SingleInfo, TinyInfoµÈ£¬¶ø²»ÊÇÁí½¨Ò»¸öCutSecondClusterµÈ£¬ÎªÁË½ÚÊ¡ÄÚ´æ£¿
-	//×¢Òâvector.clearÒÔ½ÚÊ¡ÄÚ´æ
-	//cout<<LumpInfo.size()<<"\n";
-
-	//*******************************************************************************************************
-	//Õë¶ÔµÚÒ»´Î·Ö¸îºó£¬É¸Ñ¡³öµÄÈ¾É«ÌåÍÅLumpInfo½øĞĞ¶ş´Î·Ö¸î---------------------------------------------------------------------------(Ä¿Ç°ÔÚCutSecond£¬MywatershedÀïÓĞbug¡£ÔİÊ±Ìø¹ıÕâÒ»²½£¬ºóĞødebug»òÕß¸ÄËã·¨)
-	//*******************************************************************************************************
-	//Êä³öLump£¬debug
-	//for (int i = 0;i<LumpInfo.size();i++)
-	//{
-	//	imwrite("C://Users//MaTengfei//Desktop//tt//lump//" + Int_to_String(i) + imgformat, LumpInfo[i].GetClusterImage());
-	//}
-
-	//cout << "¿ªÊ¼¶ş´Î·Ö¸î¡­¡­\n";
-	CutSecond(LumpInfo);
-	//cout << LumpInfo.size() << "\n";
-	vector<ClassClusterInfo> LITemp, SITemp, TITemp;
-	ClassifyChromo(LumpInfo, LITemp, SITemp, TITemp);
-	//cout<<LumpInfo.size()<<"\t"<<SITemp.size()<<"\n";
-	LumpInfo.insert(LumpInfo.begin(), LITemp.begin(), LITemp.end());
-	LITemp.clear();
-	//cout<<SingleInfo.size()<<"\n";
-	SingleInfo.insert(SingleInfo.end(), SITemp.begin(), SITemp.end());
-	//cout<<SingleInfo.size()<<"\t"<<SITemp.size()<<"\n";
-	SITemp.clear();
-	TinyInfo.insert(TinyInfo.end(), TITemp.begin(), TITemp.end());
-	TITemp.clear();
-	/*cout << "·Ö¸îÍê³É¡­¡­\n";*/
-
-	//////¼ìÑé·ÖÀà½á¹û£¬»­²ÊÍ¼
-	//Mat SSCS=Mat::zeros(image.size(),CV_8UC3);
-	//DrawClassChromInfoVector(SingleInfo,SSCS);
-	//imwrite(filename+"rr//"+imgname+"."+"SSCS"+imgformat,SSCS);
-	//Mat SSCL=Mat::zeros(image.size(),CV_8UC3);
-	//DrawClassChromInfoVector(LumpInfo,SSCL);
-	//imwrite(filename+"rr//"+imgname+"."+"SSCL"+imgformat,SSCL);
-	//Mat SSCT=Mat::zeros(image.size(),CV_8UC3);
-	//DrawClassChromInfoVector(TinyInfo,SSCT);
-	//imwrite(filename+"rr//"+imgname+"."+"SSCT"+imgformat,SSCT);
-
-	//*******************************************************************************************************
-	//ÀûÓÃHSVÏòÁ¿£¬É¸Ñ¡ÔÓÖÊ
-	//*******************************************************************************************************
-
-	HSVRemoveImpurity(SingleInfo, LumpInfo, TinyInfo); // LumpInfo :È¾É«ÌåÍÅµÄÏà¹ØĞÅÏ¢
-	////Êä³öSingle±ãÓÚµ¥¶ÀÑĞ¾¿
-	//for(int i=0;i<SingleInfo.size();i++)
-	//{
-	//	imwrite(filename+"rr//ri//"+imgname+"."+Int_to_String(i)+imgformat,SingleInfo[i].GetClusterImage());
-	////	cout<<CutFirstLocation[i].GetLabel()<<"\t"<<i<<"\n";
-	//}
-	//¸øÌïçùÖÆÍ¼
-
-	//for(int i=0;i<SingleInfo.size();i++)
-	//{
-	//	TQN++;
-	//	Mat TQ=Mat::zeros(256,256,CV_8UC3);
-	//	Size Ssize;
-	//	Mat TQImg=SingleInfo[i].GetClusterImage();
-	//	double S=((TQImg.cols>TQImg.rows)?250.0/TQImg.cols:250.0/TQImg.rows);
-	//	Ssize.width=TQImg.cols*S;//Ñ¹ËõÍ¼Æ¬£¬¼õÉÙÊı¾İÁ¿£¬¼Ó¿ìÔËËã
-	//	Ssize.height=TQImg.rows*S;
-	//	Mat img;
-	//	resize(TQImg,img,Ssize,0,0,INTER_LINEAR);
-	//	Mat imgROI = img.clone()/*(Rect(0, 0,SingleInfo[i].GetUprightRect().width*S, SingleInfo[i].GetUprightRect().height*S))*/;  //Rect·½·¨¶¨ÒåROI,×¢Òâ¿íÊÇ£ºcols£»¸ßÊÇrows¡£  
-	//	//imshow("imgROI",imgROI);
-	//	//ÒÆ¶¯
-	//	//Mat logo=imgROI;
-	//	Mat mask=imgROI.clone();
-	//	threshold(mask, mask, 0, 255, THRESH_BINARY);//¶Ômask½øĞĞ¶şÖµ»¯£¬½«mask½øÒ»²½´¦Àí  
-	//	//bitwise_not(mask, mask);//¶ÔmaskÍ¼ÏñÈ¡·´£¬0±ä255
-	//	Mat imgLocation;
-	//	imgLocation=TQ(Rect(256/2-SingleInfo[i].GetUprightRect().width*S/2, 256/2-SingleInfo[i].GetUprightRect().height*S/2,SingleInfo[i].GetUprightRect().width*S, SingleInfo[i].GetUprightRect().height*S));  //Rect·½·¨¶¨ÒåROI,×¢Òâ¿íÊÇ£ºcols£»¸ßÊÇrows¡£
-	//	imgROI.copyTo(imgLocation,mask);
-	//	imwrite(filename+"rr//"+Int_to_String(TQN)+imgformat,TQ);
-	//}
-
-	////*******************************************************************************************************
-	////Ê¶±ğSingleÈ¾É«ÌåÖĞµÄ×ÅË¿Á£µãÎ»ÖÃ
-	////*******************************************************************************************************
-	//cout << "¿ªÊ¼Ê¶±ğ¡­¡­\n";
-	//LocateCentromere(SingleInfo);
-	////Êä³öÊ¶±ğ½á¹û
-	//Mat LCimage = imread(filename + imgname + imgformat);
-	//int nk = 0;
-	//int Num0 = 0;
-	//putText(LCimage, "Suspected Single:", Point(50, 200), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//putText(LCimage, Int_to_String(SingleInfo.size()), Point(500 + 50, 200), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//putText(LCimage, "Suspected Cluster:", Point(50, 250), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//putText(LCimage, Int_to_String(LumpInfo.size()), Point(500 + 50, 250), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//putText(LCimage, "Suspected Tiny:", Point(50, 300), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//putText(LCimage, Int_to_String(TinyInfo.size()), Point(500 + 50, 300), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//for (int i = 0;i<SingleInfo.size();i++)
-	//{
-	//	putText(LCimage, Int_to_String(i), SingleInfo[i].GetRelativeOrigin(), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//	int CLVS = SingleInfo[i].GetCentromereLocationVector().size();
-
-	//	if (CLVS >= 2)
-	//	{
-	//		nk++;
-	//		//cout<<i<<"\t"<<CLVS<<"\n";
-	//		putText(LCimage, "Suspected Dicentric:", Point(50, 300 + nk * 50), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//		putText(LCimage, "(" + Int_to_String(nk) + ")", Point(500 + 50, 300 + nk * 50), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//		putText(LCimage, Int_to_String(i), Point(600 + 50, 300 + nk * 50), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//		putText(LCimage, Int_to_String(CLVS), Point(700 + 50, 300 + nk * 50), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//	}
-	//	if (CLVS == 0)
-	//	{
-
-	//		Num0++;
-	//	}
-	//	for (int j = 0;j<CLVS;j++)
-	//	{
-	//		circle(LCimage, SingleInfo[i].GetCentromereLocationVector()[j], 5, Scalar(0, 255, 255), -1, 8);
-	//	}
-	//}
-	//putText(LCimage, "No find Centromere:", Point(50, 150), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-	//putText(LCimage, Int_to_String(Num0), Point(500 + 50, 150), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 1, 8, 0);
-
-	//for (int i = 0;i<LumpInfo.size();i++)
-	//{
-	//	putText(LCimage, Int_to_String(i), LumpInfo[i].GetRelativeOrigin(), FONT_HERSHEY_COMPLEX, 1.0, Scalar(255, 255, 255), 1, 8, 0);
-	//}
-	//for (int i = 0;i<TinyInfo.size();i++)
-	//{
-	//	putText(LCimage, Int_to_String(i), TinyInfo[i].GetRelativeOrigin(), FONT_HERSHEY_COMPLEX, 1.0, Scalar(200, 200, 0), 1, 8, 0);
-	//	rectangle(LCimage, Point(TinyInfo[i].GetRelativeOrigin().x, TinyInfo[i].GetRelativeOrigin().y), cvPoint(TinyInfo[i].GetRelativeOrigin().x + TinyInfo[i].GetUprightRect().width, TinyInfo[i].GetRelativeOrigin().y + TinyInfo[i].GetUprightRect().height), cvScalar(200, 200, 0), 1, 4, 0); ;
-	//}
+	//ä»out.txtä¸­è¯»å–å¤„ç†ç»“æœ
+	bool nothing = true;
+	fstream file;
+	int ch;
 
 
-	//imwrite(filename + "rr//" + imgname + "_" + "1" + imgformat, LCimage);
-
-
-	////ToÆîÑÇ·å
-	//	 
-	//Mat LCimage=imread(filename+imgname+imgformat);
-	//int nk=0;
-	//int Num0=0;
-	//for(int i=0;i<SingleInfo.size();i++)
-	//{
-	// int CLVS=SingleInfo[i].GetCentromereLocationVector().size();
-	// if(CLVS==2)
-	// {
-	//	 for(int j=0;j<CLVS;j++)
-	//	 {
-	//		 circle(LCimage,SingleInfo[i].GetCentromereLocationVector()[j], 5, Scalar(0, 255, 255), -1, 8);
-	//	 }
-	// }
-	//}
-
-	//imwrite(filename+"rr//Q//"+imgname+"_"+"1"+imgformat,LCimage);
-
-	//*******************************************************************************************************
-	////ÅÅÁĞÏÔÊ¾
-	//*******************************************************************************************************
-
-	//Mat SSimage= Mat::zeros(1500,2000,CV_8UC3);
-	//sort(SingleInfo,SortClassClusterInfoGreater_L);
-	//int dicNum=0;
-	//int normalNum=0;
-	//int TinyNum=0;
-	//OrderedShow(SingleInfo,SSimage,dicNum,Point(10,10),100,150,2,10,0.5);
-	//OrderedShow(SingleInfo,SSimage,normalNum,Point(10,160),50,150,1,1,0.5);
-	//OrderedShow(LumpInfo,SSimage,Point(10,610),200,200,0.5);
-	//OrderedShow(TinyInfo,SSimage,Point(10,850),50,50,1.0);
-	//OrderedShow(SingleInfo,SSimage,TinyNum,Point(10,900),50,150,0,0,0.5);
-	//int imgw=SSimage.size().width;
-	//int imgh=SSimage.size().height;
-	//putText(SSimage,"dic:",Point(imgw-300,imgh-200),FONT_HERSHEY_COMPLEX,1.0,Scalar(255, 255, 255),1,8,0);
-	//putText(SSimage,Int_to_String(dicNum),Point(imgw-100,imgh-200),FONT_HERSHEY_COMPLEX,1.0,Scalar(255, 255, 255),1,8,0);
-
-	//putText(SSimage,"normal:",Point(imgw-300,imgh-150),FONT_HERSHEY_COMPLEX,1.0,Scalar(255, 255, 255),1,8,0);
-	//putText(SSimage,Int_to_String(normalNum),Point(imgw-100,imgh-150),FONT_HERSHEY_COMPLEX,1.0,Scalar(255, 255, 255),1,8,0);
-
-	//putText(SSimage,"cluster:",Point(imgw-300,imgh-100),FONT_HERSHEY_COMPLEX,1.0,Scalar(255, 255, 255),1,8,0);
-	//putText(SSimage,Int_to_String(LumpInfo.size()),Point(imgw-100,imgh-100),FONT_HERSHEY_COMPLEX,1.0,Scalar(255, 255, 255),1,8,0);	 //int DicNum=0;
-
-	//putText(SSimage,"tiny:",Point(imgw-300,imgh-50),FONT_HERSHEY_COMPLEX,1.0,Scalar(255, 255, 255),1,8,0);
-	//putText(SSimage,Int_to_String(TinyInfo.size()+TinyNum),Point(imgw-100,imgh-50),FONT_HERSHEY_COMPLEX,1.0,Scalar(255, 255, 255),1,8,0);	 //int DicNum=0;
-
-
-
-	//imwrite(filename+"rr//"+imgname+"_"+"2"+imgformat,SSimage);
-	////imshow("½á¹û",SSimage);
-	//*******************************************************************************************************
-	////CNNÔ¤²â
-	//*******************************************************************************************************
-	if (SingleInfo.size() < 10)//µ¥¸öÈ¾É«ÌåÌ«ÉÙ£¬¾ÍÃ»±ØÒªÊ¶±ğÁË£¬Ö±½ÓÌø¹ı
+	while (nothing)
 	{
-		/*cout << "µ¥¸öÈ¾É«ÌåÊıÄ¿Ì«ÉÙ£¬Ìø¹ı£¡\n";*/
-		return pB;
-	}
-	OnePicResult.chromosome_num = SingleInfo.size() + LumpInfo.size() * 2; //½üËÆºóµÄÈ¾É«ÌåÌõÊı
-	//µ÷Õûµ¥¸öÈ¾É«ÌåÍ¼Ïñ³ß´ç£¬²¢´æ½øvector
-	vector<Mat> SingleVec;
-	for (int i = 0; i<SingleInfo.size(); i++)
-	{
-		SingleVec.push_back(normalizeImgSizeCNN(SingleInfo[i].GetClusterImage(), CNN_IMG_SIZE));
-		//imwrite("C://Users//MaTengfei//Desktop//tt//" + Int_to_String(i) + ".bmp", normalizeImgSizeCNN(SingleInfo[i].GetClusterImage(), CNN_IMG_SIZE));
-	}
-	vector<int> DicFlage;
-	//cout << "¿ªÊ¼Ê¶±ğ\n";
-	long start = clock();  //¿ªÊ¼Ê±¼ä
-	CNNpredict(SingleVec, DicFlage);
-	long finish = clock();
-	long t = finish - start;
-	time1.push_back(t);
-	//cout << "Ê¶±ğ½áÊø\n";
-	//½«SingleInfo¶ÔÓ¦±êÖ¾Î»½øĞĞ±ê¼Ç
-	for (int i = 0; i < SingleInfo.size(); i++)
-	{
-		SingleInfo[i].SetAberrationFlage(DicFlage[i]);
-		//cout << i << "\t" << SingleInfo[i].GetAberrationFlage() << "\n";
-	}
-
-	int dicNum=0;
-	//ÏÔÊ¾º¬Ë«×ÅµÄÍ¼Æ¬
-	for (int i = 0; i < SingleInfo.size(); i++)
-	{
-		if (SingleInfo[i].GetAberrationFlage() == 1)
+		
+		int nFileExit = _access(wholefilename.c_str(), 0);
+		if (nFileExit == 0)
 		{
-			dicNum++;
-		}	
-	}
+			//å­˜åœ¨
+			nothing = false;
+			//è§£ætxté‡Œçš„ç»“æœ
+			int64 start = 0, end = 0;
+			start = cv::getTickCount();
+			//ä¿å­˜ç»“æœè·¯å¾„
+			string savetxtpath = "C:\\Users\\xibao\\Desktop\\rstResult.txt";
+			ifstream txtfin;
+			txtfin.open(savetxtpath, ios::in); // æ‰“å¼€æ¨¡å¼å¯çœç•¥ ()
+			assert(txtfin.is_open());   //è‹¥å¤±è´¥,åˆ™è¾“å‡ºé”™è¯¯æ¶ˆæ¯,å¹¶ç»ˆæ­¢ç¨‹åºè¿è¡Œ 
+			string lineStr;
+			vector<string> linestring;
 
-	OnePicResult.dic = dicNum;
-	if (dicNum > 0 && abs(OnePicResult.chromosome_num - 46) < 5)
-	{
-		//²»Õı³£Ï¸°ûÊı+1
-		OnePicResult.abnormal = 1;
-
-		/*Mat abeShow = imread(picpath).clone();
-		for (int i = 0; i < SingleInfo.size(); i++)
-		{
-			if (SingleInfo[i].GetAberrationFlage() == 1)
+			while (getline(txtfin, lineStr))
 			{
-				Rect rect = SingleInfo[i].GetUprightRect();
-				rectangle(abeShow, rect, Scalar(255, 255, 0), 2);
+				linestring.push_back(lineStr);
 			}
+
+			//å¦‚æœtxtä¸ºç©º
+			if (linestring.size() < 1) return pB;
+
+			int lineNum = linestring.size();
+			string splitImgResultString = linestring[lineNum - 1];
+			linestring.pop_back();
+			string splitImgNameString = linestring[lineNum - 2];
+			linestring.pop_back();
+
+			//å¦‚æœtxtä¸­æ²¡æœ‰è¯†åˆ«çš„æœ€ç»ˆç»“æœ
+			if (splitImgNameString.find("#") != string::npos) return pB;
+
+			//æ›´æ–°lineNum
+			lineNum -= 2;
+			//cout << "a\n";
+			//************************************************************************************************
+			//è§£æsplitImgResultString å’Œ splitImgNameString
+			//************************************************************************************************
+			vector<string> splitImgResult;
+			vector<string> splitImgName;
+			int splitImgResultString_n = splitImgResultString.find(",");
+			while (splitImgResultString_n != string::npos)
+			{
+				//cout << splitImgResultString.substr(0, splitImgResultString_n) << "\n";
+				splitImgResult.push_back(splitImgResultString.substr(0, splitImgResultString_n));
+				splitImgResultString = splitImgResultString.substr(splitImgResultString_n + 1, string::npos);
+				splitImgResultString_n = splitImgResultString.find(",");
+			}
+			int splitImgNameString_n = splitImgNameString.find(",");
+			while (splitImgNameString_n != string::npos)
+			{
+				string tmpstring = splitImgNameString.substr(0, splitImgNameString_n);
+
+				int tmp_b = tmpstring.find("\\");
+				int tmp_e = tmpstring.find(".");
+				tmpstring = tmpstring.substr(tmp_b + 1, tmp_e - tmp_b - 1);
+				//cout << tmpstring << "\n";
+				splitImgName.push_back(tmpstring);
+
+				splitImgNameString = splitImgNameString.substr(splitImgNameString_n + 1, string::npos);
+				splitImgNameString_n = splitImgNameString.find(",");
+			}
+
+			//************************************************************************************************
+			//mtf20191011 ç›®å‰å°å›¾åå­—ä¸å¤§å›¾å¯¹åº”åŒ¹é…çš„ç®—æ³•ç›¸å½“æš´åŠ›ï¼Œåç»­éœ€è¦æ”¹è¿›ç®—æ³•æé«˜æ•ˆç‡
+			//************************************************************************************************
+			//cout << splitImgResult.size() << "\t" << splitImgName.size() << "\t";
+			assert(splitImgResult.size() == splitImgResult.size());
+			for (int i = 0; i < splitImgResult.size(); i++)
+			{
+				splitImgResult[i] = splitImgName[i] + "," + splitImgResult[i];
+				//cout << splitImgResult[i] << "\n";
+			}
+			splitImgName.clear();
+
+			sort(splitImgResult.begin(), splitImgResult.end(), split_cmp);
+			for (int i = 0; i < splitImgResult.size(); i++)
+			{
+				cout << splitImgResult[i] << "\n";
+			}
+			sort(linestring.begin(), linestring.end() - 2, imgName_cmp);
+			for (int i = 0; i < lineNum; i++)
+			{
+				cout << linestring[i] << "\n";
+			}
+
+			//************************************************************************************************
+
+			//************************************************************************************************
+			//ç”¨äºæŒ‡ç¤ºsplitImgResultå½“å‰ä½ç½®
+			
+			int sIRp = 0;
+			vector<vector<string>>	splitImgLocResult(lineNum, vector<string>(Max_splitImgNum));//å­˜æ¯å¼ å¤§å›¾ä¸­å°å›¾çš„è¯¦ç»†ä¿¡æ¯
+			vector<string> ImgChromNum(lineNum);//å­˜æ¯å¼ å¤§å›¾çš„æŸ“è‰²ä½“æ•°
+			vector<string> ImgPath(lineNum);//å­˜æ¯å¼ å¤§å›¾çš„è·¯å¾„
+			for (int i = 0; i < lineNum; i++)
+			{
+				//if (i > 10) break;
+				string tmpLine = linestring[i];
+				int tmpLine_n = tmpLine.find("#");
+				string tmpimgPath = tmpLine.substr(0, tmpLine_n);
+				ImgPath[i] = tmpimgPath;
+				//è¾“å‡ºå¤§å›¾è·¯å¾„å
+				cout << tmpimgPath << "\n";
+
+				string subtmpLine = tmpLine.substr(tmpLine_n + 1, string::npos);
+
+				//è§£ææŸ“è‰²ä½“æ¡æ•°
+				int tmpChromNum_n = subtmpLine.find("#");
+				string tmpChromNum = subtmpLine.substr(0, tmpChromNum_n);
+				ImgChromNum[i] = tmpChromNum;
+				cout << tmpChromNum << "\t";
+
+				subtmpLine = subtmpLine.substr(tmpChromNum_n + 1, string::npos);
+
+
+				int subtmpLine_n = subtmpLine.find("#");
+				
+				int sILR = 0;
+
+				while (subtmpLine_n != string::npos)
+				{
+					string tmpsplitImgLoc = subtmpLine.substr(0, subtmpLine_n);
+					subtmpLine = subtmpLine.substr(subtmpLine_n + 1, string::npos);
+					subtmpLine_n = subtmpLine.find("#");
+					//å°†è¯†åˆ«ç»“æœä¸å°å›¾å¯¹åº”åæ ‡å†™åœ¨ä¸€èµ·ï¼Œä¸¤è€…åº”è¯¥ä¸€ä¸€å¯¹åº”ï¼Œæ•…æ•°æ®é•¿åº¦å¿…å®šä¸€æ ·
+					if (sIRp >= splitImgResult.size()) break;
+					string sIRstring = splitImgResult[sIRp];
+					cout << cutName(tmpimgPath) << "\t" << cutsplitImgName(sIRstring) << "\n";
+
+					if (cutName(tmpimgPath) == cutsplitImgName(sIRstring))
+					{
+						int n = sIRstring.find(",");
+						sIRstring = sIRstring.substr(n + 1, string::npos);
+						tmpsplitImgLoc = tmpsplitImgLoc + "@" +  sIRstring;
+						//splitImgLocResult[i].push_back(tmpsplitImgLoc);
+						splitImgLocResult[i][sILR] = tmpsplitImgLoc;
+						sILR++;
+
+						sIRp++;
+					}
+					else
+					{
+						cout << "æœ‰é—æ¼\n";
+					}
+					
+					//splitImgLoc[i].push_back(tmpsplitImgLoc);
+					//è¾“å‡ºå°å›¾ç›¸å…³ä¿¡æ¯
+					cout << tmpsplitImgLoc << "\n";
+				}
+				//è¡¥é½
+				while (sILR < Max_splitImgNum)
+				{
+					splitImgLocResult[i][sILR] = "#,#,#,#,#";
+					sILR++;
+				}
+			}
+			end = cv::getTickCount();
+			cout << "è§£æéœ€è¦æ—¶é—´: " << (end - start) / cv::getTickFrequency() << " s" << endl;
+
+
+			//å°†è§£æç»“æœå­˜å…¥æ•°æ®åº“
+			for (size_t j = 0; j < ImgPath.size(); j++)
+			{
+				OnePicResult.patientname = patientname;
+				USES_CONVERSION; CString s(ImgPath[j].c_str());
+				OnePicResult.picpath =s;
+				OnePicResult.LastResult = splitImgLocResult[j];
+				OnePicResult.chromosome_num = stoi(ImgChromNum[j]);
+				//cout << "OnePicResult.chromosome_num" << OnePicResult.chromosome_num;
+				ReadCHRO.SaveOnePicResult(OnePicResult);
+				//ç»Ÿè®¡æ€»çš„åŒç€æ•°ï¼š
+				ReadCHRO.CountResultFromBigImg(patientname);
+			}
+
+		}
+		else
+		{
+			//ä¸å­˜åœ¨
+			nothing = true;
 		}
 
 
-		imwrite(writename + file1name1, abeShow);
-*/
-
-
-		//char DesTempFilePath[MAX_PATH + 1];
-		//char sucTempFilePath[MAX_PATH + 1];
-		//WCHAR   wstr[MAX_PATH];
-		//WCHAR   wstr_des[MAX_PATH];
-		//sprintf_s(sucTempFilePath, "%s", (road1name1 + "\\" + file1name1).c_str());
-		//sprintf_s(DesTempFilePath, "%s", (writename + file1name1).c_str());
-
-		//MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
-		//MultiByteToWideChar(CP_ACP, 0, DesTempFilePath, -1, wstr_des, sizeof(wstr_des));
-		//int abc = CopyFile(wstr, wstr_des, TRUE);
-
-		//×ÜÏ¸°ûÊı
-		OnePicResult.allcell = OnePicResult.normalcell + OnePicResult.abnormal;
-		OnePicResult.picpath = (writename + file1name1).c_str();
-
-		//½«¸ÃÕÅÕÕÆ¬µÄ·ÖÎö½á¹û´æµ½Êı¾İ¿â
-		ReadCHRO.SaveOnePicResult(OnePicResult);
 	}
-	else{
-		//Õı³£Ï¸°ûÊı+1
-		OnePicResult.normalcell = 1;
-	}
-	//ÏÔÊ¾»û±äÊ¶±ğ½á¹û
 
-	//imshow("abeShow", abeShow);
-	//waitKey(0);
-
-
-	pB->dic += dicNum;
-	pB->abnormal += OnePicResult.abnormal;
-	pB->normalcell += OnePicResult.normalcell;
-	pB->allcell = pB->abnormal + pB->normalcell;
-	pB->Y = (double)pB->abnormal / (double)pB->allcell;
 	return pB;
 }
 
 
+//å°å›¾åå­—ä¸­çš„å’Œå¤§å›¾åå­—ä¸­é‡åˆçš„éƒ¨åˆ†
+inline string cutsplitImgName(string s)
+{
+	int n = s.find("_");
+	return s.substr(0, n);
+}
+//å°å›¾åå­—ä¸­åˆ†å‰²å‡ºæ ‡æ³¨åºåˆ—çš„æ•°å­—
+inline int cutsplitImgOrder(string s)
+{
+	int n = s.find("_");
+	return std::stoi(s.substr(n + 1, string::npos));
+}
+
+bool split_cmp(string s1, string s2)
+{
+	string s1b = cutsplitImgName(s1);
+	string s2b = cutsplitImgName(s2);
+	if (s1b == s2b)
+	{
+		return cutsplitImgOrder(s1) < cutsplitImgOrder(s2);
+	}
+	return s1b < s2b;
+}
+
+// æˆªå–å¤§å›¾åœ°å€ä¸­å°å›¾åå­—
+//åç»­éœ€è¦æ ¹æ®å…·ä½“å‘½åè§„åˆ™è¿›è¡Œä¿®æ”¹
+//ç›®å‰æ˜¯æˆªå–å¤§å›¾å…¨åä¸­çš„æ•°å­—éƒ¨åˆ†
+inline string cutName(string s)
+{
+	int n = s.find("æŸ“è‰²ä½“");
+	int ne = s.find(".");
+	return s.substr(n + 1 + 2 * 3, ne - (n + 1 + 2 * 3));
+}
+
+bool imgName_cmp(string s1, string s2)
+{
+	s1 = cutName(s1);
+	s2 = cutName(s2);
+	return s1 < s2;
+}

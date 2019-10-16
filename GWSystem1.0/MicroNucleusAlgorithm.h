@@ -55,6 +55,5 @@ public:
 	string WChar2Ansi(LPCWSTR pwszSrc);
 
 	
-
 };
 

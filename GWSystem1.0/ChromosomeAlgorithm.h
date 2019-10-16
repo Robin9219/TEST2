@@ -20,11 +20,12 @@ public:
 	ADOAccess m_Conn;
 
 	int normalNum = 0;
-	
+
 
 
 
 	// 染色体分析主函数
-	CHRO_HandleResult* DicMain(string road1name1, string file1name1, string writename, CString patientname, CHRO_HandleResult* pB);
+	CHRO_HandleResult* DicMain(vector<string>ImgWaitingForAna, string writename, CString patientname,
+		CHRO_HandleResult *pB);
 };
 

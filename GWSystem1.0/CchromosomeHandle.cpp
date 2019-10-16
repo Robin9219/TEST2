@@ -61,6 +61,7 @@ void CChromosomeHandle::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DATEENDCHRO, m_datetimeend);
 	DDX_Control(pDX, IDC_LIST_RESULTCHRO, m_listchroresult);
 	//DDX_Control(pDX, IDC_GRID_CHRO, m_pGridchro);
+	DDX_Control(pDX, IDC_EDIT_ANANUMCHRO, m_analysenumchro);
 }
 
 
@@ -166,6 +167,17 @@ BOOL CChromosomeHandle::OnInitDialog()
 	m_datetimebegin.SetRange(&MinTime, &MaxTime);
 	m_datetimeend.SetRange(&MinTime, &MaxTime);
 
+
+	COleDateTime  currOleDate;
+	m_datetimeend.GetTime(currOleDate);
+	COleDateTime oleDate;
+	oleDate.SetDate(currOleDate.GetYear(), currOleDate.GetMonth(), currOleDate.GetDay() - 3);
+	m_datetimebegin.SetTime(oleDate);
+
+	//设置默认批量
+	pHandleDlg->m_analysenumchro.SetWindowTextW(_T("50"));
+
+
 	//建立处理结果窗口 但隐藏
 	if (pChromosomeResult == NULL){//判定对话框是否有所指向
 		pChromosomeResult = new CChromosomeResult(this);//指向一个非模对话框示例
@@ -178,6 +190,9 @@ BOOL CChromosomeHandle::OnInitDialog()
 	//将本次扫描信息导入列表 并选中
 	LoadCurrentToList();
 
+	//刚进入，自动查询一次
+	OnBnClickedBtnFindchro();
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常:  OCX 属性页应返回 FALSE
 }
@@ -188,15 +203,15 @@ int CChromosomeHandle::DeleteAccessTable()
 {
 	_bstr_t sql;
 	_variant_t var;
-	sql = _T("delete  * from 染色体图像分析结果数据表");
-	try
-	{
-		m_Conn.GetRecordSet(sql);
-	}
-	catch (_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
+	//sql = _T("delete  * from 染色体图像分析结果数据表");
+	//try
+	//{
+	//	m_Conn.GetRecordSet(sql);
+	//}
+	//catch (_com_error *e)
+	//{
+	//	AfxMessageBox(e->ErrorMessage());
+	//}
 
 	sql = _T("delete  * from 染色体图像分析结果数据表（已删除）");
 	try
@@ -258,6 +273,8 @@ void CChromosomeHandle::OnBnClickedBtnChrohandle()
 
 	AnalyseFinishedCHRO = false;
 
+	//CString name = _T("玻片5");
+	//ReadAndWrite.CountResultFromBigImg(name);
 	//1.获取所选中的病人数组，加入AllPatientsChose
 	int nItem, i;
 	nItem = m_listchrohandle.GetItemCount();
@@ -278,25 +295,7 @@ void CChromosomeHandle::OnBnClickedBtnChrohandle()
 //分析线程
 void CChromosomeHandle::ThreadProcWaitCHRO()
 {
-	//初始化python
-	//在使用Python系统前，必须使用Py_Initialize对其
-	//进行初始化。它会载入Python的内建模块并添加系统路
-	//径到模块搜索路径中。这个函数没有返回值，检查系统
-	//是否初始化成功需要使用Py_IsInitialized。
-	Py_Initialize();
-	// 检查初始化是否成功
-	if (!Py_IsInitialized())
-	{
-		AfxMessageBox(_T("python初始化失败!\n"));
-	}
-	PyRun_SimpleString("print('come in python')");
-	//显示python版本信息
-	cout << "显示python版本信息：";
-	cout << (Py_GetVersion()) << "\n";
-	/*PyObject* sys = PyImport_ImportModule("sys");*/
-	//PyRun_SimpleString("import sys"); // 执行 python 中的短语句  
-	//PyRun_SimpleString("sys.path.append('./')");
-	//PyRun_SimpleString("import cv2");
+
 
 	//生成处理时间文件夹
 	string strWrite = CT2A(pHandleDlg->WritePath.GetBuffer());
@@ -317,6 +316,12 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 	pHandleDlg->StrTime = strDate + strTime + index;
 
 	pHandleDlg->ResultRow = 0;
+
+	//获取批量
+	CString strAnalyseNum;
+	pHandleDlg->m_analysenumchro.GetWindowTextW(strAnalyseNum);
+	int analysenum = _ttoi(strAnalyseNum);
+
 	for (size_t i = 0; i < pHandleDlg->AllPatientsChose.size(); i++)
 	{
 		//vector<bool>().swap(m_Scanning_Control->Scanning_Completed_Status);
@@ -348,26 +353,99 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 		pChromosomeResult->PatientNames.push_back(name);
 
 		size_t newStart = 0;
+		int deletedPicNum = 0;
+		int alalysedNum = 0;
+		vector<string>ImgWaitingForAna;
+
+		cout << "ChroImgNames.size:" << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
 		while (pHandleDlg->patientNewImg)//判断该病人是否有新的图片加入
 		{
-			for (size_t j = newStart; j < pHandleDlg->AllPatientsChose[i].ChroImgNames.size(); j++)
+			string readpath = CT2A(pHandleDlg->AllPatientsChose[i].ImgPath.GetBuffer());
+			bool loopover = false;
+			while (!loopover)
 			{
-				string readpath = CT2A(pHandleDlg->AllPatientsChose[i].ImgPath.GetBuffer());
-				string imgname = CT2A(pHandleDlg->AllPatientsChose[i].ChroImgNames[j].GetBuffer());
-				pHandleDlg->AllPatientsChose[i].Result = algorithm.DicMain(readpath, imgname, StrFileSolveChro, pHandleDlg->AllPatientsChose[i].PatientName, pB);
-				pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
-				pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size() + 1;
-				pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
-				pHandleDlg->AllPatientsChose[i].Result->resultfile = pHandleDlg->AllPatientsChose[i].ResultPath;
-				pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
+				if (pHandleDlg->AllPatientsChose[i].ChroImgNames.size() - alalysedNum > 5&&
+					pHandleDlg->AllPatientsChose[i].ChroImgNames.size() - alalysedNum < analysenum)
+				{
+					for (size_t k = alalysedNum; k < pHandleDlg->AllPatientsChose[i].ChroImgNames.size(); k++)
+					{
+						string imgname = CT2A(pHandleDlg->AllPatientsChose[i].ChroImgNames[k].GetBuffer());
+						string read1name1 = readpath + imgname;//读取的总路径
+						ImgWaitingForAna.push_back(read1name1);
 
-				CString mystr1, mystr2;
-				mystr1.Format(_T("%d"), j + 1);
-				mystr2 = mystr1 + _T("/") + mystr;
+	
 
-				HWND   hwnd = ::FindWindow(NULL, _T("染色体处理"));//调用消息处理函数刷新页面
-				::SendMessage(hwnd, WM_INIT_TABLECHRO, (WPARAM)mystr2.AllocSysString(), (WPARAM)row);//线程中传递定时器消息，以开启定时器，刷新显示照片
+						CString mystr1, mystr2;
+						mystr1.Format(_T("%d"), k + 1);
+						mystr2 = mystr1 + _T("/") + mystr;
+
+						HWND   hwnd = ::FindWindow(NULL, _T("染色体处理"));//调用消息处理函数刷新页面
+						::SendMessage(hwnd, WM_INIT_TABLECHRO, (WPARAM)mystr2.AllocSysString(), (WPARAM)row);//线程中传递定时器消息，以开启定时器，刷新显示照片
+					}
+					pHandleDlg->AllPatientsChose[i].Result = algorithm.DicMain(ImgWaitingForAna, StrFileSolveChro, pHandleDlg->AllPatientsChose[i].PatientName, pB);
+					pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
+					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size() + 1;
+					pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
+					pHandleDlg->AllPatientsChose[i].Result->resultfile = pHandleDlg->AllPatientsChose[i].ResultPath;
+					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
+
+					alalysedNum += ImgWaitingForAna.size();
+					vector<string>().swap(ImgWaitingForAna);
+				}
+				else if (pHandleDlg->AllPatientsChose[i].ChroImgNames.size() - alalysedNum >= analysenum)
+				{
+
+					for (size_t k = alalysedNum; k < alalysedNum + analysenum; k++)
+					{
+
+						string imgname = CT2A(pHandleDlg->AllPatientsChose[i].ChroImgNames[k].GetBuffer());
+						string read1name1 = readpath + imgname;//读取的总路径
+						ImgWaitingForAna.push_back(read1name1);
+
+						//int currentImgNum = ImgWaitingForAna.size();
+						//cout << "已分析数 +待分析数：" << currentImgNum << "     ";
+						//cout << "图片总数：" << MicroImgNames.size() << endl;
+						//cout << "ImgWaitingForAna[i]" << ImgWaitingForAna[i];
+
+						CString mystr1, mystr2;
+						mystr1.Format(_T("%d"), k + 1);
+						mystr2 = mystr1 + _T("/") + mystr;
+
+						HWND   hwnd = ::FindWindow(NULL, _T("染色体处理"));//调用消息处理函数刷新页面
+						::SendMessage(hwnd, WM_INIT_TABLECHRO, (WPARAM)mystr2.AllocSysString(), (WPARAM)row);//线程中传递定时器消息，以开启定时器，刷新显示照片
+					}
+
+					pHandleDlg->AllPatientsChose[i].Result = algorithm.DicMain(ImgWaitingForAna, StrFileSolveChro, pHandleDlg->AllPatientsChose[i].PatientName, pB);
+					pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
+					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size() + 1;
+					pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
+					pHandleDlg->AllPatientsChose[i].Result->resultfile = pHandleDlg->AllPatientsChose[i].ResultPath;
+					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
+
+					alalysedNum += ImgWaitingForAna.size();
+					vector<string>().swap(ImgWaitingForAna);
+
+				}
+
+				//判断已分析的双核细胞数是否达到2000
+				//cout<<"pHandleDlg->AllPatientsChose[i].PatientName "<<pHandleDlg->AllPatientsChose[i].PatientName<<endl;
+				int ImgNum = ReadAndWrite.CountChromosome(pHandleDlg->AllPatientsChose[i].PatientName);
+				//cout << "alalysedNum: " << alalysedNum;
+				//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
+				if (alalysedNum <pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
+				{
+					if (ImgNum>200)
+						loopover = true;
+					else
+						loopover = false;
+				}
+				else
+				{
+					loopover = true;
+				}
+
 			}
+
 			//查询该病人的图片是否在增加
 			vector<CString>patientNewImgPath = pHandleDlg->InquiryPatientImg(pHandleDlg->AllPatientsChose[i].PatientName, pHandleDlg->AllPatientsChose[i].ImgPath);
 			int patientNewImgNum = patientNewImgPath.size();
@@ -448,9 +526,9 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 
 	}
 
-	//关闭python调用
 	//**************************************************************************************************
-	Py_Finalize();
+
+
 
 	//分析结束
 	AnalyseFinishedCHRO = true;

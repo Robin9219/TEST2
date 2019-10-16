@@ -359,7 +359,9 @@
     <ClCompile Include="UserLoad.cpp" />
     <ClCompile Include="UserMangement.cpp" />
     <ClCompile Include="染色体算法文件\BoolSort.cpp" />
-    <ClCompile Include="染色体算法文件\ClassClusterInfo.cpp" />
+    <ClCompile Include="染色体算法文件\ClassClusterInfo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="染色体算法文件\ClassifyChromo.cpp" />
     <ClCompile Include="染色体算法文件\CNNpredict.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -389,7 +391,9 @@
     <ClCompile Include="染色体算法文件\mywatershed.cpp" />
     <ClCompile Include="染色体算法文件\NonezeroMeanGrayValue.cpp" />
     <ClCompile Include="染色体算法文件\NonezeroMeanRGBVector.cpp" />
-    <ClCompile Include="染色体算法文件\normalizeImgSizeCNN.cpp" />
+    <ClCompile Include="染色体算法文件\normalizeImgSizeCNN.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="染色体算法文件\RandomColor.cpp" />
     <ClCompile Include="染色体算法文件\res.cpp" />
     <ClCompile Include="着丝粒点识别\BlankFrame.cpp" />
