@@ -294,9 +294,9 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 	int m_nMinute = time.GetMinute(); ///分钟
 	int m_nSecond = time.GetSecond(); ///秒
 	CString strDate;
-	strDate.Format(_T("%d年%d月%d日"), m_nYear, m_nMonth, m_nDay); //定义日期格式
+	strDate.Format(_T("%d-%d-%d-"), m_nYear, m_nMonth, m_nDay); //定义日期格式
 	CString strTime = time.Format(_T("%H-%M-%S")); //定义时间格式
-	CString index(_T("的处理结果"));
+	CString index(_T("result"));
 	pHandleDlg->StrTime = strDate + strTime + index;
 
 	pHandleDlg->ResultRow = 0;
@@ -341,7 +341,7 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 		int deletedPicNum = 0;
 		int alalysedNum = 0;
 		vector<string>ImgWaitingForAna;
-
+		int ImgNum = 0;
 
 		while (pHandleDlg->patientNewImg)//判断该病人是否有新的图片加入
 		{
@@ -383,6 +383,18 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 
 					alalysedNum += ImgWaitingForAna.size();
 					vector<string>().swap(ImgWaitingForAna);
+					ImgNum = ReadAndWriteMN.CountDoubleCell(pHandleDlg->AllPatientsChose[i].PatientName);
+					if (alalysedNum <pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
+					{
+						if (ImgNum>Max_DoubleCellNum)
+							loopover = true;
+						else
+							loopover = false;
+					}
+					else
+					{
+						loopover = true;
+					}
 				}
 				else if (pHandleDlg->AllPatientsChose[i].MicroImgNames.size() - alalysedNum >= analysenum)
 				{
@@ -416,23 +428,28 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 
 						alalysedNum += ImgWaitingForAna.size();
 						vector<string>().swap(ImgWaitingForAna);
-
+						//判断已分析的双核细胞数是否达到2000
+						ImgNum = ReadAndWriteMN.CountDoubleCell(pHandleDlg->AllPatientsChose[i].PatientName);
+						if (alalysedNum <pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
+						{
+							if (ImgNum>Max_DoubleCellNum)
+								loopover = true;
+							else
+								loopover = false;
+						}
+						else
+						{
+							loopover = true;
+						}
 					}
-
-				//判断已分析的双核细胞数是否达到2000
-				int ImgNum = ReadAndWriteMN.CountDoubleCell(pHandleDlg->AllPatientsChose[i].PatientName);
-				/*cout << "ImgNum: " << ImgNum;*/
-				if (alalysedNum <pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
-				{
-					if (ImgNum>2000)
-						loopover = true;
-					else
-						loopover = false;
-				}
-				else
+				else //没有图片存在，跳出批量分析
 				{
 					loopover = true;
 				}
+
+
+				/*cout << "ImgNum: " << ImgNum;*/
+
 
 			}
 

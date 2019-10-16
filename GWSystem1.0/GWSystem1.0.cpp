@@ -83,10 +83,10 @@ BOOL CGWSystem10App::InitInstance()
 	//sName = sName.substr(0, sName.rfind('\\'));
 	//SetCurrentDirectory(sName.c_str());
 
-#ifdef RELEASE_DEBUG
-	//开启控制控制台
+#ifdef RELEASE_DEBUG	//开启控制控制台
 	AllocConsole();//注意检查返回值
 	freopen("CONOUT$", "w", stdout);
+
 	//登录
 #endif
 

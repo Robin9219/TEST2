@@ -1402,7 +1402,7 @@ int CReadAndWriteForAccess::CountDoubleCell(CString patientname)
 	}
 	catch (_com_error e)
 	{
-		AfxMessageBox(e.Description());
+		//AfxMessageBox(e.Description());
 	}
 	return imgnum;
 }
@@ -1436,7 +1436,7 @@ int CReadAndWriteForAccess::CountChromosome(CString patientname)
 	}
 	catch (_com_error e)
 	{
-		AfxMessageBox(e.Description());
+		/*AfxMessageBox(e.Description());*/
 	}
 	return imgnum;
 }

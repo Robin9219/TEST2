@@ -279,16 +279,16 @@ void CChromosomeResult::OnCbnSelchangeComboPatientch()
 		PicClear(IDC_NameCHRO[v]);
 	}
 	int current = m_comboxpatient.GetCurSel();
-	if (current >= 0)
-	{
-		CurrentPatientName = pChromosomeResult->AllQuestionImgPath[m_comboxpatient.GetCurSel()].patientname;
-		Page = 0;
-		//显示选中病人的照片
-		vector<CHRO_HandleResultOnePic>().swap(AllImgAndResult);
-		AllImgAndResult = GetOnePatientImgInformation(CurrentPatientName);
-		ShowPicToImgctrl(AllImgAndResult);
-		SetTimer(1, 3000, NULL);
-	}
+	//if (current >= 0)
+	//{
+	//	CurrentPatientName = pChromosomeResult->AllQuestionImgPath[m_comboxpatient.GetCurSel()].patientname;
+	//	Page = 0;
+	//	//显示选中病人的照片
+	//	vector<CHRO_HandleResultOnePic>().swap(AllImgAndResult);
+	//	AllImgAndResult = GetOnePatientImgInformation(CurrentPatientName);
+	//	ShowPicToImgctrl(AllImgAndResult);
+	//	SetTimer(1, 3000, NULL);
+	//}
 		//将结果显示清空
 		CString str = NULL;
 

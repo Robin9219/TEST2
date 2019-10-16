@@ -571,9 +571,22 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 		}
 		fclose(fp);
 
+		string wholefilename = "E:\\tmp\\321\\tNMresult.txt";
+
+		WCHAR   wstr[MAX_PATH];
+		char sucTempFilePath[MAX_PATH + 1];
+		sprintf_s(sucTempFilePath, "%s", wholefilename.c_str());
+		MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
+		DeleteFile(wstr);
+
+
+		cout << "开始调用分析软件" << endl;
+
+
 		//调用分析软件.exe
 		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "‪E:\\GWsystem\\111vector_predict\\x64\\Release", NULL, NULL, SW_SHOW);
-		HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_SHOW);
+		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_SHOW);
+		HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_HIDE);
 		if ((int)hNewExe == ERROR_FILE_NOT_FOUND)
 		{
 			std::cout << "指定工作目录：文件找不到" << std::endl;
@@ -594,7 +607,7 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 
 
 
-
+		cout << "即将开始解析：" << endl;
 		//从out.txt中读取处理结果
 		bool nothing = true;
 		fstream file;
@@ -603,10 +616,12 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 
 		while (nothing)
 		{
-			string wholefilename = "E:\\tmp\\321\\tNMresult.txt";
+			
 			int nFileExit = _access(wholefilename.c_str(), 0);
 			if (nFileExit == 0)
 			{
+				cout << "文件存在，开始解析" << endl;
+
 				//存在
 				nothing = false;
 				//解析结果
@@ -707,6 +722,8 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 				//cout << "resul_name[0]: " << result[0] << endl;
 
 				//cout << "result[0]: " << result[0] << endl;
+				cout << "解析完成，并开始存数据库" << endl;
+
 				for (int i = 1; i < ((a + 1) / 2); i++)//从1开始
 				{
 
@@ -848,6 +865,7 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 
 				}
 
+				cout << "解析后存数据库完成" << endl;
 				vector<string>().swap(imgNames4_1);
 				vector<string>().swap(imgNames0_1);
 
@@ -863,7 +881,9 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 			else
 			{
 				//不存在
+				cout << "结果文件不存在" << endl;
 				nothing = true;
+
 			}
 
 

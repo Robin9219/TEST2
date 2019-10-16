@@ -175,7 +175,7 @@ BOOL CChromosomeHandle::OnInitDialog()
 	m_datetimebegin.SetTime(oleDate);
 
 	//设置默认批量
-	pHandleDlg->m_analysenumchro.SetWindowTextW(_T("50"));
+	pHandleDlg->m_analysenumchro.SetWindowTextW(_T("10"));
 
 
 	//建立处理结果窗口 但隐藏
@@ -310,9 +310,9 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 	int m_nMinute = time.GetMinute(); ///分钟
 	int m_nSecond = time.GetSecond(); ///秒
 	CString strDate;
-	strDate.Format(_T("%d年%d月%d日"), m_nYear, m_nMonth, m_nDay); //定义日期格式
+	strDate.Format(_T("%d-%d-%d-"), m_nYear, m_nMonth, m_nDay); //定义日期格式
 	CString strTime = time.Format(_T("%H-%M-%S")); //定义时间格式
-	CString index(_T("的处理结果"));
+	CString index(_T("result"));
 	pHandleDlg->StrTime = strDate + strTime + index;
 
 	pHandleDlg->ResultRow = 0;
@@ -356,6 +356,7 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 		int deletedPicNum = 0;
 		int alalysedNum = 0;
 		vector<string>ImgWaitingForAna;
+		int ImgNum = 0;
 
 		cout << "ChroImgNames.size:" << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
 		while (pHandleDlg->patientNewImg)//判断该病人是否有新的图片加入
@@ -391,6 +392,29 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 
 					alalysedNum += ImgWaitingForAna.size();
 					vector<string>().swap(ImgWaitingForAna);
+
+					int ImgNum = ReadAndWrite.CountChromosome(pHandleDlg->AllPatientsChose[i].PatientName);
+					//cout << "alalysedNum: " << alalysedNum;
+					//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
+					if (alalysedNum <pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
+					{
+						if (ImgNum>Max_ChromImgNum)
+						{
+							loopover = true;
+							//图片已经分析足够，给出停止扫描信号
+							m_Scanning_Control->s_User_Para.Stop_Scanning_RightNow = true;
+						}
+						else
+						{
+							loopover = false;
+						}
+					}
+					else
+					{
+						loopover = true;
+
+					}
+
 				}
 				else if (pHandleDlg->AllPatientsChose[i].ChroImgNames.size() - alalysedNum >= analysenum)
 				{
@@ -425,24 +449,36 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 					alalysedNum += ImgWaitingForAna.size();
 					vector<string>().swap(ImgWaitingForAna);
 
+					int ImgNum = ReadAndWrite.CountChromosome(pHandleDlg->AllPatientsChose[i].PatientName);
+					//cout << "alalysedNum: " << alalysedNum;
+					//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
+					if (alalysedNum <pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
+					{
+						if (ImgNum>Max_ChromImgNum)
+						{
+							loopover = true;
+							//图片已经分析足够，给出停止扫描信号
+							m_Scanning_Control->s_User_Para.Stop_Scanning_RightNow = true;
+						}
+						else
+						{
+							loopover = false;
+						}
+					}
+					else
+					{
+						loopover = true;
+					}
+
+
+				}
+				else //没有图片存在，跳出批量分析
+				{
+					loopover = true;
 				}
 
 				//判断已分析的双核细胞数是否达到2000
 				//cout<<"pHandleDlg->AllPatientsChose[i].PatientName "<<pHandleDlg->AllPatientsChose[i].PatientName<<endl;
-				int ImgNum = ReadAndWrite.CountChromosome(pHandleDlg->AllPatientsChose[i].PatientName);
-				//cout << "alalysedNum: " << alalysedNum;
-				//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
-				if (alalysedNum <pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
-				{
-					if (ImgNum>200)
-						loopover = true;
-					else
-						loopover = false;
-				}
-				else
-				{
-					loopover = true;
-				}
 
 			}
 
@@ -677,11 +713,8 @@ void CChromosomeHandle::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 void CChromosomeHandle::OnBnClickedBtnFindchro()
 {
 	// TODO:  在此添加控件通知处理程序代码
-	//清空原表格
-	m_listchrohandle.DeleteAllItems();
-
-	vector<ChroTable> vecEmpty1;
-	AllPatients.swap(vecEmpty1);//清空每一轮查找的图
+	//是否有本次扫描的图片 如果有 加入
+	LoadCurrentToList();
 
 	//1.获得相应时间段内的玻片图片
 	COleDateTime TimeBegin, TimeEnd;
@@ -708,7 +741,7 @@ void CChromosomeHandle::OnBnClickedBtnFindchro()
 	}
 
 	//3.将路径集合数组里面的路径下的病人图片进行归类，显示到表格
-	int patientRow = 0;
+	
 	for (size_t pathNum_i = 0; pathNum_i < AllCHROImgPath.size(); pathNum_i++)
 	{
 		int picNum = 0;

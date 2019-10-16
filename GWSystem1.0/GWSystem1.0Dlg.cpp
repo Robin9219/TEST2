@@ -270,21 +270,21 @@ BOOL CGWSystem10Dlg::OnInitDialog()
 	ShowAllSlide.OnInitDialog();
 	MainWinImgShow.PutPicControlIntoVector();	//初始将picture控件放入数组
 
-	////硬件初始化
-	//HardwareInit.InitHardwarePara(allpara);
+	//硬件初始化
+	HardwareInit.InitHardwarePara(allpara);
 
 
-	//HWND hWnd;
-	//hWnd = GetDlgItem(IDC_VIDEOFRAME)->GetSafeHwnd();
-	//HardwareInit.OnInitDialog(hWnd);
+	HWND hWnd;
+	hWnd = GetDlgItem(IDC_VIDEOFRAME)->GetSafeHwnd();
+	HardwareInit.OnInitDialog(hWnd);
 
-	////数据库中读到的数据传给硬件
-	//AllParaSet HardPara;
-	//HardPara.HardwareParaSet(m_Scanning_Control, allpara);
+	//数据库中读到的数据传给硬件
+	AllParaSet HardPara;
+	HardPara.HardwareParaSet(m_Scanning_Control, allpara);
 
-	////手动遥感
-	//m_Scanning_Control->Handlehold_Thread_Running = true;
-	//CWinThread* _pHandlehold_Control = AfxBeginThread(Scanning_Control::Handlehold_ThreadFunc, m_Scanning_Control);
+	//手动遥感
+	m_Scanning_Control->Handlehold_Thread_Running = true;
+	CWinThread* _pHandlehold_Control = AfxBeginThread(Scanning_Control::Handlehold_ThreadFunc, m_Scanning_Control);
 
 	CRect rect;
 	GetClientRect(&rect); //取客户区大小
@@ -783,7 +783,7 @@ DWORD WINAPI ThreadProc(PVOID pParam)
 
 	//3.将玻片信息整理成病人信息，存入病人设置表
 
-
+	m_Scanning_Control->s_User_Para.Stop_Scanning_RightNow = false;
 
 
 	for (size_t i = 0; i < pDlg->Slide->All_Slide_ID.size(); i++)
@@ -839,14 +839,16 @@ DWORD WINAPI ThreadProc(PVOID pParam)
 			m_Scanning_Control->s_Scanning_Para.Current_Slide_Num = pDlg->Slide->All_Slide_ID[i];
 			m_Scanning_Control->s_Scanning_Para.Forcuing_OR_Scanning = true;
 			pDlg->SetTimer(5, 300, NULL);
-			m_Scanning_Control->Do_Focusing_Model(m_Scanning_Control->s_Scanning_System_Para.Focusing_Step_Z[2]);
+			if (!m_Scanning_Control->s_User_Para.Stop_Scanning_RightNow)//判断是否停止扫描
+				m_Scanning_Control->Do_Focusing_Model(m_Scanning_Control->s_Scanning_System_Para.Focusing_Step_Z[2]);
 
 			//CA 10X下自动扫描、自动染色体团定位
 			m_Scanning_Control->CA_Focus_Thread_Running = true;
 			CWinThread* pThread = AfxBeginThread(Scanning_Control::Get_CA_Pos_10X_ThreadFunc, m_Scanning_Control);
 			m_Scanning_Control->s_Scanning_Para.Forcuing_OR_Scanning = false;
 			pDlg->SetTimer(6, 300, NULL);
-			m_Scanning_Control->Do_Scanning_Model();
+			if (!m_Scanning_Control->s_User_Para.Stop_Scanning_RightNow)//判断是否停止扫描
+				m_Scanning_Control->Do_Scanning_Model();
 
 
 			//CA 100X下自动聚焦扫描
@@ -860,7 +862,8 @@ DWORD WINAPI ThreadProc(PVOID pParam)
 			//m_Scanning_Control->m_FocusingImage_Save_Paras.lcConversion.DemosaicMethod = LUCAM_DM_FAST;
 			//m_Scanning_Control->m_FocusingImage_Save_Paras.lcConversion.CorrectionMatrix = LUCAM_CM_HALOGEN;
 			m_Scanning_Control->s_Scanning_System_Para.Focusing_Step_Z[2] = 100;
-			m_Scanning_Control->Do_Focusing_100X();
+			if (!m_Scanning_Control->s_User_Para.Stop_Scanning_RightNow)//判断是否停止扫描
+				m_Scanning_Control->Do_Focusing_100X();
 
 
 

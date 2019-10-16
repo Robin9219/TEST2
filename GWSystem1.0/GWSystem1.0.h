@@ -370,6 +370,9 @@ struct PatientWithSlide
 
 //目前，调用的exe中，每张大图分割出的小图最大数量为56，
 const int Max_splitImgNum = 56;
+const int Max_DoubleCellNum = 2000;
+const int Max_ChromImgNum = 10;
+
 
 string CStringtoString(CString cs);
 
