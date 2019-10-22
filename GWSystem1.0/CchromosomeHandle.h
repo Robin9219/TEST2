@@ -57,6 +57,7 @@ public:
 	CString OneImgName;
 	vector<WaitToPrint> CHROWaitPrint;
 	bool patientNewImg;
+	CString SelectedName;
 
 public:
 	virtual BOOL OnInitDialog();

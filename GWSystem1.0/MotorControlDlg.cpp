@@ -32,6 +32,7 @@ void MotorControlDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_TABLECHOSE, m_combotablenum);
+	DDX_Control(pDX, IDC_EDIT_PUMB, m_pumboil);
 }
 
 
@@ -65,6 +66,7 @@ BEGIN_MESSAGE_MAP(MotorControlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_Y_MOVETO, &MotorControlDlg::OnBnClickedBtnYMoveto)
 	ON_BN_CLICKED(IDC_BTN_Z_MOVETO, &MotorControlDlg::OnBnClickedBtnZMoveto)
 	ON_BN_CLICKED(IDC_BTN_READCURRENTPOS, &MotorControlDlg::OnBnClickedBtnReadcurrentpos)
+	ON_BN_CLICKED(IDC_BTN_PUMB, &MotorControlDlg::OnBnClickedBtnPumb)
 END_MESSAGE_MAP()
 
 
@@ -86,6 +88,8 @@ BOOL MotorControlDlg::OnInitDialog()
 
 	GetDlgItem(IDC_EDIT_X_MOVESPEED)->SetWindowText(_T("0.1"));
 	GetDlgItem(IDC_EDIT_Y_MOVESPEED)->SetWindowText(_T("0.1"));
+
+	m_pumboil.SetWindowTextW(_T("1000"));
 
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -728,5 +732,16 @@ void MotorControlDlg::OnBnClickedBtnReadcurrentpos()
 	{
 		AfxMessageBox(_T("获取位置信息失败！"));
 	}
+
+}
+
+//泵油
+void MotorControlDlg::OnBnClickedBtnPumb()
+{
+	// TODO:  在此添加控件通知处理程序代码
+	CString Pumb_oil;
+	m_pumboil.GetWindowTextW(Pumb_oil);
+	int pumb_oil = _ttoi(Pumb_oil);
+	MotorDlg_Scanning_Control->s_Dev_Drivers->Dev_PUSIRobot_Single_Mov(5, pumb_oil, 600, false);
 
 }

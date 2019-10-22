@@ -188,16 +188,16 @@ BOOL CChromosomeResult::OnInitDialog()
 	m_Conn.OnInitADOAccess();
 	//清空病人数组
 	vector<CString>().swap(PatientNames);
-	//从数据库中获取所有的病人名
-	GetAllPatientNames();
+	//从数据库中获取病人名
+	//GetAllPatientNames();
 	//病人名填入ComBox
-	m_comboxpatient.ResetContent();
-	for (size_t i = 0; i < PatientNames.size(); i++)
-	{
-		m_comboxpatient.InsertString(i, PatientNames[i]);
-	}
-	m_comboxpatient.SetCurSel(0);
-	OnCbnSelchangeComboPatientch();
+	//m_comboxpatient.ResetContent();
+	//for (size_t i = 0; i < PatientNames.size(); i++)
+	//{
+	//	m_comboxpatient.InsertString(i, PatientNames[i]);
+	//}
+	//m_comboxpatient.SetCurSel(0);
+	//OnCbnSelchangeComboPatientch();
 
 	greenPen.CreatePen(PS_SOLID, 5, RGB(0, 255, 0));
 	redPen.CreatePen(PS_SOLID, 5, RGB(255, 0, 0));
@@ -274,19 +274,20 @@ void CChromosomeResult::OnCbnSelchangeComboPatientch()
 {
 	// TODO:  在此添加控件通知处理程序代码
 	//清空画框
+	m_comboxpatient.SetWindowTextW(pHandleDlg->SelectedName);
 	for (int v = 0; v < 9; v++)
 	{
 		PicClear(IDC_NameCHRO[v]);
 	}
-	int current = m_comboxpatient.GetCurSel();
+	/*int current = m_comboxpatient.GetCurSel();*/
 	//if (current >= 0)
 	//{
 	//	CurrentPatientName = pChromosomeResult->AllQuestionImgPath[m_comboxpatient.GetCurSel()].patientname;
 	//	Page = 0;
 	//	//显示选中病人的照片
 	//	vector<CHRO_HandleResultOnePic>().swap(AllImgAndResult);
-	//	AllImgAndResult = GetOnePatientImgInformation(CurrentPatientName);
-	//	ShowPicToImgctrl(AllImgAndResult);
+	AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+	ShowPicToImgctrl(AllImgAndResult);
 	//	SetTimer(1, 3000, NULL);
 	//}
 		//将结果显示清空
@@ -419,7 +420,7 @@ void CChromosomeResult::MainWindowLastpage()
 
 	//刷新界面
 	vector<CHRO_HandleResultOnePic>().swap(AllImgAndResult);
-	AllImgAndResult = GetOnePatientImgInformation(CurrentPatientName);
+	AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
 	ShowPicToImgctrl(AllImgAndResult);
 	
 }
@@ -438,7 +439,7 @@ void CChromosomeResult::MainWindowNextpage()
 
 	//刷新界面
 	vector<CHRO_HandleResultOnePic>().swap(AllImgAndResult);
-	AllImgAndResult = GetOnePatientImgInformation(CurrentPatientName);
+	AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
 	ShowPicToImgctrl(AllImgAndResult);
 }
 
@@ -1223,6 +1224,8 @@ void CChromosomeResult::OnEnChangeEditDicrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+		/*FreshResult(AllImgAndResult,Temp);*/
 	}	// TODO:  在此添加控件通知处理程序代码
 
 }
@@ -1237,6 +1240,8 @@ void CChromosomeResult::OnEnChangeEditTrirg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 	// TODO:  在此添加控件通知处理程序代码
 }
@@ -1251,6 +1256,8 @@ void CChromosomeResult::OnEnChangeEditRoundrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 	// TODO:  在此添加控件通知处理程序代码
 }
@@ -1265,6 +1272,8 @@ void CChromosomeResult::OnEnChangeEditAcerg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 
 }
@@ -1279,6 +1288,8 @@ void CChromosomeResult::OnEnChangeEditTenrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 }
 
@@ -1292,6 +1303,8 @@ void CChromosomeResult::OnEnChangeEditTrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 }
 
@@ -1305,6 +1318,8 @@ void CChromosomeResult::OnEnChangeEditInvrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 }
 
@@ -1318,6 +1333,8 @@ void CChromosomeResult::OnEnChangeEditDelrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 }
 
@@ -1331,6 +1348,8 @@ void CChromosomeResult::OnEnChangeEditCtgrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 }
 
@@ -1340,6 +1359,8 @@ void CChromosomeResult::OnEnChangeEditCsgrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 }
 
@@ -1353,6 +1374,8 @@ void CChromosomeResult::OnEnChangeEditCtbrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 }
 
@@ -1366,6 +1389,8 @@ void CChromosomeResult::OnEnChangeEditCterg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	// TODO:  在此添加控件通知处理程序代码
 }
 
@@ -1378,6 +1403,8 @@ void CChromosomeResult::OnEnChangeEditChronumrg()
 	if (checked)
 	{
 		OnBnClickedBtnChload2lib();
+		AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
+
 	}	
 
 }
@@ -1405,9 +1432,9 @@ vector<CHRO_HandleResultOnePic>CChromosomeResult::GetOnePatientImgInformation(CS
 		{
 			name = m_Conn.m_pRecordset->GetCollect(_T("所属病人或代号"));
 			//mode = m_Conn.m_pRecordset->GetCollect(_T("模式"));
-
+			cout << "patientname: " << patientname << endl;
 			//if (name.Find(patientname) != -1 && mode == "染色体")
-			if (name.Find(patientname) != -1 )
+			if (name == patientname)
 			{
 				onepic.patientname = name;
 				onepic.picpath = m_Conn.m_pRecordset->GetCollect(_T("照片路径"));
@@ -1522,8 +1549,6 @@ vector<CHRO_HandleResultOnePic>CChromosomeResult::GetOnePatientImgInformation(CS
 				else
 					onepic.chromosome_num_check = 0;
 
-
-
 				result.push_back(onepic);
 			}
 
@@ -1546,6 +1571,7 @@ vector<CHRO_HandleResultOnePic>CChromosomeResult::GetOnePatientImgInformation(CS
 void CChromosomeResult::ShowPicToImgctrl(vector<CHRO_HandleResultOnePic> allpic)
 {
 	int j = 0;
+	cout << "allpic: " << allpic.size() << endl;
 
 	int sumpagenum = allpic.size() / 9 + 1;
 	sumpage.Format(_T("%d"), sumpagenum);
@@ -1559,10 +1585,12 @@ void CChromosomeResult::ShowPicToImgctrl(vector<CHRO_HandleResultOnePic> allpic)
 		{
 			//显示图片
 			string currrentpath;
-			if (allpic[i].CheckPath =="0")
+			if (allpic[i].CheckOrNot == 0)
 				currrentpath = CT2A(allpic[i].picpath.GetBuffer());
 			else
 				currrentpath = CT2A(allpic[i].CheckPath.GetBuffer());
+
+			cout << "currrentpath: " << currrentpath << endl;
 
 			Mat CurrentMat = cv::imread(currrentpath);
 
@@ -1740,7 +1768,7 @@ void  CChromosomeResult::MarkQua(CString picturepath)
 
 	//刷新界面
 	vector<CHRO_HandleResultOnePic>().swap(AllImgAndResult);
-	AllImgAndResult = GetOnePatientImgInformation(CurrentPatientName);
+	AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
 	ShowPicToImgctrl(AllImgAndResult);
 
 }
@@ -1778,7 +1806,7 @@ void  CChromosomeResult::MarkUnq(CString picturepath)
 
 	//刷新界面
 	vector<CHRO_HandleResultOnePic>().swap(AllImgAndResult);
-	AllImgAndResult = GetOnePatientImgInformation(CurrentPatientName);
+	AllImgAndResult = GetOnePatientImgInformation(pHandleDlg->SelectedName);
 	ShowPicToImgctrl(AllImgAndResult);
 }
 
@@ -2164,7 +2192,7 @@ void CChromosomeResult::OnLButtonDown(UINT nFlags, CPoint point)
 		if (Temp < AllImgAndResult.size())
 		{
 			string currrentpath;
-			if (AllImgAndResult[Temp].CheckPath == "0")
+			if (AllImgAndResult[Temp].CheckOrNot == 0)
 				currrentpath = CT2A(AllImgAndResult[Temp].picpath.GetBuffer());
 			else
 				currrentpath = CT2A(AllImgAndResult[Temp].CheckPath.GetBuffer());
@@ -2265,7 +2293,7 @@ void CChromosomeResult::OnLButtonDown(UINT nFlags, CPoint point)
 				//标记为合格
 				/*MarkQua(AllImgAndResult[Temp].picpath);*/
 				//从数据库中统计所有合格的（已校正的）图片的总分析结果
-				CString strq = pChromosomeResult->AllQuestionImgPath[m_comboxpatient.GetCurSel()].patientname;
+				CString strq = pHandleDlg->SelectedName;
 				CountTheSumFromAcces(strq);
 				checked = true;
 
@@ -2343,6 +2371,58 @@ BOOL CChromosomeResult::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	return CDialogEx::OnMouseWheel(nFlags, zDelta, pt);
 }
 
+void CChromosomeResult::FreshResult(vector<CHRO_HandleResultOnePic>& AllImgAndResult, unsigned int  Temp)
+{
+	CString str;
+
+
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].dic_rg);
+	m_dicrg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].round_rg);
+	m_roundrg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].ace_rg);
+	m_acerg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].t_rg);
+	m_trg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].inv_rg);
+	m_invrg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].tri_rg);
+	m_trirg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].ten_rg);
+	m_tenrg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].del_rg);
+	m_delrg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].ctg_rg);
+	m_ctgrg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].csg_rg);
+	m_csgrg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].ctb_rg);
+	m_ctbrg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].cte_rg);
+	m_cterg.SetWindowTextW(str);
+
+	str.Format(_T("%d"), AllImgAndResult[Temp].chromosome_num_check);
+	m_chronumrg.SetWindowTextW(str);
+
+	//标记为合格
+	/*MarkQua(AllImgAndResult[Temp].picpath);*/
+	//从数据库中统计所有合格的（已校正的）图片的总分析结果
+	CString strq = pHandleDlg->SelectedName;
+	CountTheSumFromAcces(strq);
+
+}
 
 
 

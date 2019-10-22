@@ -251,7 +251,6 @@ CHRO_HandleResult* CChromosomeAlgorithm::DicMain(vector<string>ImgWaitingForAna,
 						//splitImgLocResult[i].push_back(tmpsplitImgLoc);
 						splitImgLocResult[i][sILR] = tmpsplitImgLoc;
 						sILR++;
-
 						sIRp++;
 					}
 					else

@@ -62,4 +62,7 @@ public:
 
 private:
 	CComboBox m_combotablenum;
+public:
+	afx_msg void OnBnClickedBtnPumb();
+	CEdit m_pumboil;
 };

@@ -273,6 +273,10 @@ void CMicroNucleusHandle::OnBnClickedBtnMicrohandle()
 			Row.push_back(i);
 		}
 	}
+	cout << "AllPatientsChose.size()" << AllPatientsChose.size() << endl;
+	cout << "AllPatientsChose[1].PatientName" << AllPatientsChose[1].PatientName << endl;
+	
+
 
 	//2.开始分析
 	thread MNAnalyse(ThreadProcWaitMN);
@@ -384,7 +388,7 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 					alalysedNum += ImgWaitingForAna.size();
 					vector<string>().swap(ImgWaitingForAna);
 					ImgNum = ReadAndWriteMN.CountDoubleCell(pHandleDlg->AllPatientsChose[i].PatientName);
-					if (alalysedNum <pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
+					if (alalysedNum <=pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
 					{
 						if (ImgNum>Max_DoubleCellNum)
 							loopover = true;
@@ -430,7 +434,7 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 						vector<string>().swap(ImgWaitingForAna);
 						//判断已分析的双核细胞数是否达到2000
 						ImgNum = ReadAndWriteMN.CountDoubleCell(pHandleDlg->AllPatientsChose[i].PatientName);
-						if (alalysedNum <pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
+						if (alalysedNum <=pHandleDlg->AllPatientsChose[i].MicroImgNames.size())
 						{
 							if (ImgNum>Max_DoubleCellNum)
 								loopover = true;

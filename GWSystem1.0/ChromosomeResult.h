@@ -171,6 +171,9 @@ public:
 
 	void ShowPicToImgctrl(vector<CHRO_HandleResultOnePic> allpic);
 
+	//改完一个edit更新界面上的结果
+	void FreshResult(vector<CHRO_HandleResultOnePic> &AllImgAndResult, unsigned int  Temp);
+
 	void MarkQua(CString picturepath);
 	void MarkUnq(CString picturepath);
 

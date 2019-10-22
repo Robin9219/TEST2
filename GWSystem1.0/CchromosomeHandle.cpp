@@ -365,7 +365,7 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 			bool loopover = false;
 			while (!loopover)
 			{
-				if (pHandleDlg->AllPatientsChose[i].ChroImgNames.size() - alalysedNum > 5&&
+				if (pHandleDlg->AllPatientsChose[i].ChroImgNames.size() - alalysedNum > 10&&
 					pHandleDlg->AllPatientsChose[i].ChroImgNames.size() - alalysedNum < analysenum)
 				{
 					for (size_t k = alalysedNum; k < pHandleDlg->AllPatientsChose[i].ChroImgNames.size(); k++)
@@ -394,10 +394,15 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 					vector<string>().swap(ImgWaitingForAna);
 
 					int ImgNum = ReadAndWrite.CountChromosome(pHandleDlg->AllPatientsChose[i].PatientName);
-					//cout << "alalysedNum: " << alalysedNum;
-					//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
-					if (alalysedNum <pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
+
+					cout << "ImgNum" << ImgNum << endl;
+					cout << "Max_ChromImgNum" << Max_ChromImgNum << endl;
+					cout << "alalysedNum: " << alalysedNum << endl;
+					cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size() << endl;
+					if (alalysedNum <=pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
 					{
+
+
 						if (ImgNum>Max_ChromImgNum)
 						{
 							loopover = true;
@@ -450,10 +455,17 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 					vector<string>().swap(ImgWaitingForAna);
 
 					int ImgNum = ReadAndWrite.CountChromosome(pHandleDlg->AllPatientsChose[i].PatientName);
+					cout << "ImgNum" << ImgNum << endl;
+					cout << "Max_ChromImgNum" << Max_ChromImgNum << endl;
+					cout << "alalysedNum: " << alalysedNum << endl;
+					cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size() << endl;
+
 					//cout << "alalysedNum: " << alalysedNum;
 					//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
-					if (alalysedNum <pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
+					if (alalysedNum <=pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
 					{
+
+
 						if (ImgNum>Max_ChromImgNum)
 						{
 							loopover = true;
@@ -681,6 +693,8 @@ void CChromosomeHandle::ClearAllSeries(void)
 void CChromosomeHandle::OnBnClickedBtnChrosolve()
 {
 	// TODO:  在此添加控件通知处理程序代码
+	pChromosomeResult->m_comboxpatient.ResetContent();
+	pChromosomeResult->m_comboxpatient.InsertString(0, SelectedName);
 	pChromosomeResult->ShowWindow(SW_SHOW);//不显示
 
 }
@@ -706,6 +720,15 @@ void CChromosomeHandle::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	//int row = m_listchrohandle.GetSelectionMark();
 	//CString name = m_listchrohandle.GetItemText(row, 1);
 	//ShowOneResult(name);
+	//SelectedName = name;
+
+	////如果分析完，将结果显示按钮点亮
+	//name = m_listchrohandle.GetItemText(row, 5);
+	//if (name == '√')
+	//	GetDlgItem(IDC_BTN_CHROHANDLE)->EnableWindow(TRUE);//有list选项选中后使删除按钮可用
+	//else
+	//	GetDlgItem(IDC_BTN_CHROHANDLE)->EnableWindow(FALSE);//有list选项选中后使删除按钮可用
+
 	*pResult = 0;
 }
 
@@ -877,6 +900,16 @@ void CChromosomeHandle::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 	int row = m_listchrohandle.GetSelectionMark();
 	CString name = m_listchrohandle.GetItemText(row, 1);
 	ShowOneResult(name);
+	SelectedName = name;
+
+	//如果分析完，将结果显示按钮点亮
+	name = m_listchrohandle.GetItemText(row, 5);
+	if (name == _T("√"))
+		GetDlgItem(IDC_BTN_CHROSOLVE)->EnableWindow(TRUE);//有list选项选中后使删除按钮可用
+	else
+		GetDlgItem(IDC_BTN_CHROSOLVE)->EnableWindow(FALSE);//有list选项选中后使删除按钮可用
+
+
 	*pResult = 0;
 }
 

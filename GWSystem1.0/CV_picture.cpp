@@ -105,28 +105,35 @@ bool  CV_picture::cvLoadImage(CString &Path)
 //method缩放的方式：0表示保持图片原比例去适应m_rect,1表示拉伸图片去适应m_rect
 void CV_picture::ShowImage(Mat &img,int method)
 {
-	this->GetClientRect(&m_rect);
-	this->GetWindowRect(&m_rect_win);
+	if (!img.empty())
+	{
+		this->GetClientRect(&m_rect);
+		this->GetWindowRect(&m_rect_win);
 
-	//将img存入该类的m_dst_img并初始化roi相关参数
-	m_dst_img=img+0;
-	m_MouseDraw_img=Mat(m_dst_img.size(),m_dst_img.type(),Scalar(255,255,255));
-	m_rect_roi=Rect(0,0,m_dst_img.cols,m_dst_img.rows);
-	m_rect_roi_center.x=(float)m_rect_roi.width/2.0f+0.5f;
-	m_rect_roi_center.y=(float)m_rect_roi.height/2.0f+0.5f;
-	m_MouseDraw_rect=Rect(m_rect_roi_center.x,m_rect_roi_center.y,10,10);
-	m_dst_roi=m_dst_img(m_rect_roi);
-	m_fRoi_scale=1;
-	//图片大小相同，则直接跳过ResizeImage，将img原样复制到m_drawing减少计算量
-	if (m_dst_img.size!=m_drawing.size)
-	{
-		ResizeImage(m_dst_img,m_rect,m_drawing,method);
-	}else
-	{
-		m_drawing=m_dst_img+0;
+		//将img存入该类的m_dst_img并初始化roi相关参数
+		m_dst_img = img + 0;
+		m_MouseDraw_img = Mat(m_dst_img.size(), m_dst_img.type(), Scalar(255, 255, 255));
+		m_rect_roi = Rect(0, 0, m_dst_img.cols, m_dst_img.rows);
+		m_rect_roi_center.x = (float)m_rect_roi.width / 2.0f + 0.5f;
+		m_rect_roi_center.y = (float)m_rect_roi.height / 2.0f + 0.5f;
+		m_MouseDraw_rect = Rect(m_rect_roi_center.x, m_rect_roi_center.y, 10, 10);
+		m_dst_roi = m_dst_img(m_rect_roi);
+		m_fRoi_scale = 1;
+		//图片大小相同，则直接跳过ResizeImage，将img原样复制到m_drawing减少计算量
+		if (m_dst_img.size != m_drawing.size)
+		{
+			ResizeImage(m_dst_img, m_rect, m_drawing, method);
+		}
+		else
+		{
+			m_drawing = m_dst_img + 0;
+		}
+
+		OnPaint();
 	}
-
-	OnPaint();
+	else{
+		AfxMessageBox(_T("找不到待显示图片！"));
+	}
 }
 
 
@@ -412,8 +419,8 @@ BOOL CV_picture::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	if ((m_rect_win.PtInRect(pt))&&(1==m_bActive))
 	{
 		//计算现在src_roi相对于src的缩放比
-		//m_fRoi_scale = m_fRoi_scale + m_fRoi_scale*0.2f*(float)zDelta / 120.0f;
-		m_fRoi_scale = m_fRoi_scale + m_fRoi_scale*0.2f*(float)zDelta / 5000.0f;
+		m_fRoi_scale = m_fRoi_scale + m_fRoi_scale*0.2f*(float)zDelta / 120.0f;
+		//m_fRoi_scale = m_fRoi_scale + m_fRoi_scale*0.2f*(float)zDelta / 5000.0f;
 		//计算当前鼠标相对画板中心的偏移
 		CPoint src_draw_tl=m_rect_win.TopLeft();
 		Point pt_in_draw=Point((pt.x-src_draw_tl.x),(pt.y-src_draw_tl.y));
@@ -445,8 +452,8 @@ BOOL CV_picture::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	pShow->m_point_sum.SetWindowTextW(strnum);
 	pShow->m_chro_num.BringWindowToTop();
 
-
-	return CStatic::OnMouseWheel(nFlags, zDelta, pt);
+	return true;
+	//return CStatic::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 

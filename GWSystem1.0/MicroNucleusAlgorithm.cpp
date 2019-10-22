@@ -585,8 +585,8 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 
 		//调用分析软件.exe
 		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "‪E:\\GWsystem\\111vector_predict\\x64\\Release", NULL, NULL, SW_SHOW);
-		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_SHOW);
-		HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_HIDE);
+		HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_SHOW);
+		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_HIDE);
 		if ((int)hNewExe == ERROR_FILE_NOT_FOUND)
 		{
 			std::cout << "指定工作目录：文件找不到" << std::endl;
