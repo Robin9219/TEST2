@@ -28,6 +28,7 @@ private:
 	vector<WaitToPrint>pList;
 	ADOAccess m_Conn;
 	vector<CString>PatientInList;
+	vector<CString>PatientName;
 
 public:
 	// 生成一个病人的报表
@@ -42,4 +43,5 @@ public:
 	afx_msg void OnBnClickedBtnChroprint();
 	afx_msg void OnBnClickedBtnDelchro();
 	afx_msg void OnBnClickedBtnChrocancle();
+	virtual BOOL OnInitDialog();
 };

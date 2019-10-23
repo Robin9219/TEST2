@@ -9,6 +9,7 @@
 #include"GWSystem1.0Dlg.h"
 #include"CchromosomeHandle.h"
 #include "MarkImgCHRO.h"
+#include "ReadAndWriteForAccess.h"
 
 //图片显示
 #include <fstream>
@@ -18,6 +19,7 @@
 
 CMarkImgCHRO MarkImgCHRO;
 CChromosomeResult * pShow;
+extern CReadAndWriteForAccess  ReadCHRO;
 cv::Mat ImgMat;
 extern CGWSystem10Dlg* pDlg;
 extern CChromosomeHandle* pHandleDlg;
@@ -1113,14 +1115,14 @@ void CChromosomeResult::CountTheSumFromAcces(CString patientname)
 void CChromosomeResult::OnBnClickedBtnCheckoverchro()
 {
 	// TODO:  在此添加控件通知处理程序代码
-	CString name = pChromosomeResult->AllQuestionImgPath[m_comboxpatient.GetCurSel()].patientname;
+	CString name = pHandleDlg->SelectedName;
 	//整理出该病人总的校正结果
-	CHRO_HandleResult amendpA;
+	CHRO_HandleResult* OnePatient = new CHRO_HandleResult;
 
 	//USES_CONVERSION;
 	//CString mystr = A2W(QuaImgCurrentFile[i].currentImgPath.c_str());
 	sql = _T("select * from 染色体图像分析结果数据表\
-			 					 					 					 		where 染色体图像分析结果数据表.[所属病人或代号]='" + name + "' ");
+			 					where 染色体图像分析结果数据表.[所属病人或代号]='" + name + "' ");
 	try
 	{
 		m_Conn.GetRecordSet(sql);
@@ -1129,84 +1131,152 @@ void CChromosomeResult::OnBnClickedBtnCheckoverchro()
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
-
 	try
 	{
 		while (!m_Conn.m_pRecordset->adoEOF)
 		{
-			int quaornot = m_Conn.m_pRecordset->GetCollect(_T("QuaOrNot"));
-			if (quaornot == 1)
-			{
-				CString mystr;
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("dic_check"));
-				amendpA.dic += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的着丝粒环数"));
-				amendpA.round += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的无着丝体数"));
-				amendpA.ace += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的相互易位数"));
-				amendpA.t += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("人工校对的倒位体个数"));
-				amendpA.inv += _ttoi(mystr);
+			//CHRO_HandleResult OneCell;
+			CString str = m_Conn.m_pRecordset->GetCollect(_T("QuaOrNot"));
 
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("tri_check"));
-				amendpA.tri += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("ten_check"));
-				amendpA.ten += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("del_check"));
-				amendpA.del += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("ctg_check"));
-				amendpA.ctg += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("csg_check"));
-				amendpA.csg += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("ctb_check"));
-				amendpA.ctb += _ttoi(mystr);
-				mystr = m_Conn.m_pRecordset->GetCollect(_T("cte_check"));
-				amendpA.cte += _ttoi(mystr);
+			if (str == "1")
+			{
+				int DistortionOneCell = 0;
+				var = m_Conn.m_pRecordset->GetCollect(_T("dic_check"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->dic += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->dic = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("人工校对的着丝粒环数"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->round += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->round = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("人工校对的无着丝体数"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->ace += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->ace = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("人工校对的相互易位数"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->t += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->t = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("人工校对的倒位体个数"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->inv += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->inv = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("tri_check"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->tri += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->tri = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("ten_check"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->ten += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->ten = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("del_check"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->del += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->del = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("ctg_check"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->ctg += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->ctg = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("csg_check"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->csg += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->csg = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("ctb_check"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->ctb += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->ctb = 0;
+
+				var = m_Conn.m_pRecordset->GetCollect(_T("cte_check"));
+				if (var.vt != VT_NULL)
+				{
+					OnePatient->cte += _ttoi((_bstr_t)var);
+					DistortionOneCell += _ttoi((_bstr_t)var);
+				}
+				else
+					OnePatient->cte = 0;
+
+				if (DistortionOneCell > 0)
+					OnePatient->abnormal++;
+				OnePatient->allcell++;
 
 			}
-			
+
+
+
+
 			m_Conn.m_pRecordset->MoveNext();
-
 		}
+
+		OnePatient->DistortionNum = OnePatient->dic + OnePatient->round + OnePatient->ace + OnePatient->t + OnePatient->inv
+			+ OnePatient->csg + OnePatient->ctb + OnePatient->cte + OnePatient->ctg + OnePatient->tri + OnePatient->del;
+
+		//计算畸变率和畸变细胞率
+		float Distort_Rate = 0;
+		float DistortCell_Rate = 0;
+
+		OnePatient->Y = (float)OnePatient->DistortionNum / OnePatient->allcell;
+		OnePatient->DistortionCellRate = (float)OnePatient->abnormal / OnePatient->allcell;
+		OnePatient->patientname = name;
+
+		ReadCHRO.WriteIntoThisTurn(OnePatient);
+
+	}
 		
-	}
-	catch (_com_error e)
-	{
-		AfxMessageBox(e.Description());
-	}
-		
-	//将该病人总的校正结果存入当前分析表
-	sql = _T("select * from 染色体分析结果数据表（本次）\
-			 			 			where 染色体分析结果数据表（本次）.[所属病人或代号]='" + name + "' ");
-	try
-	{
-		m_Conn.GetRecordSet(sql);
-	}
-	catch (_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 
-	try
-	{
-		//将对应的玻片编号和照片序数存入数组，用于报表生成
-		m_Conn.m_pRecordset->PutCollect(_T("人工校正的双着丝粒体数"), _variant_t(amendpA.dic));
-		m_Conn.m_pRecordset->PutCollect(_T("人工校正的着丝粒环数"), _variant_t(amendpA.round));
-		m_Conn.m_pRecordset->PutCollect(_T("人工校正的无着丝粒体数"), _variant_t(amendpA.ace));
-		m_Conn.m_pRecordset->PutCollect(_T("人工校正的相互易位数"), _variant_t(amendpA.t));
-		m_Conn.m_pRecordset->PutCollect(_T("人工校正的倒位数"), _variant_t(amendpA.inv));
-
-		m_Conn.m_pRecordset->PutCollect(_T("tri_check"), _variant_t(amendpA.tri));
-		m_Conn.m_pRecordset->PutCollect(_T("ten_check"), _variant_t(amendpA.ten));
-		m_Conn.m_pRecordset->PutCollect(_T("del_check"), _variant_t(amendpA.del));
-		m_Conn.m_pRecordset->PutCollect(_T("ctg_check"), _variant_t(amendpA.ctg));
-		m_Conn.m_pRecordset->PutCollect(_T("csg_check"), _variant_t(amendpA.csg));
-		m_Conn.m_pRecordset->PutCollect(_T("ctb_check"), _variant_t(amendpA.ctb));
-		m_Conn.m_pRecordset->PutCollect(_T("cte_check"), _variant_t(amendpA.cte));
-		m_Conn.m_pRecordset->Update();
-
-	}
 	catch (_com_error e)
 	{
 		AfxMessageBox(e.Description());
@@ -1958,7 +2028,6 @@ void CChromosomeResult::OnRButtonDown(UINT nFlags, CPoint point)
 //	m_bigImgchro.OnLButtonDown(nFlags, point);
 //	CDialogEx::OnLButtonDown(nFlags, point);
 //}
-
 
 
 //编辑

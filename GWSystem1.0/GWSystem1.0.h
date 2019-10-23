@@ -163,7 +163,7 @@ struct  MN_HandleResultOnePic//微核分析结果数据记录结构体
 	int NumMicro = 0;//细胞微核数
 	int CheckOrNot_NumCells = 0;
 	int CheckOrNot_NumMicro = 0;
-
+	COleDateTime GrabTime;
 };
 
 //一个病人的染色体分析结果数据记录结构体
@@ -188,9 +188,12 @@ struct CHRO_HandleResult //染色体分析结果数据记录结构体
 	int csg = 0;
 	int ctb = 0;
 	int cte = 0;
+	int DistortionNum =0;
+	
 
-	double Y = 0.00;//染色体分析的畸变率
 
+	float Y = 0.00;//染色体分析的畸变率
+	float DistortionCellRate = 0.00;
 };
 
 //一张照片的染色体分析结果数据记录结构体
@@ -232,6 +235,7 @@ struct CHRO_HandleResultOnePic//染色体分析结果数据记录结构体
 	int chromosome_num = 0;
 	int chromosome_num_check = 0;
 	int QuaOrNot = 0;  //0 为未校正  1为合格 -1为不合格
+	COleDateTime GrabTime;
 
 	/*int chromNum = 0;*/
 	int CheckOrNot = 0;//此照片是否已经校对
@@ -368,10 +372,24 @@ struct PatientWithSlide
 
 };
 
+//染色体历史表
+struct ChroAnalysed
+{
+	CString patientname;//病人名
+	vector<CHRO_HandleResultOnePic>ChromosomeResult;//该病人已分析的图片信息
+};
+
+//微核历史表
+struct MNAnalysed
+{
+	CString patientname;//病人名
+	vector<MN_HandleResultOnePic>MNResult;//该病人已分析的图片信息
+};
+
 //目前，调用的exe中，每张大图分割出的小图最大数量为56，
 const int Max_splitImgNum = 56;
 const int Max_DoubleCellNum = 2000;
-const int Max_ChromImgNum = 260;
+const int Max_ChromImgNum = 200;
 
 
 string CStringtoString(CString cs);

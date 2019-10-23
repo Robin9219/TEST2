@@ -26,6 +26,6 @@ public:
 
 	// 染色体分析主函数
 	CHRO_HandleResult* DicMain(vector<string>ImgWaitingForAna, string writename, CString patientname,
-		CHRO_HandleResult *pB);
+		CHRO_HandleResult *pB, COleDateTime GrabTime);
 };
 

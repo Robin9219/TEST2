@@ -33,6 +33,7 @@ public:
 	CComboBox m_comboxreportmn;
 	CListCtrl m_listmn;
 	ADOAccess m_Conn;
+	vector<CString>PatientName;
 
 
 	// 生成一个病人的报表
@@ -45,4 +46,5 @@ public:
 	void FreshPatient();
 	afx_msg void OnBnClickedBtnMncancle();
 	afx_msg void OnBnClickedBtnPaintallmn();
+	virtual BOOL OnInitDialog();
 };

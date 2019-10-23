@@ -44,7 +44,12 @@ public:
 		CHRO_HandleResult *Result;
 		CString ImgPath; //分析图片路径
 		CString ResultPath; //结果存储路径
+		COleDateTime GrabTime;//拍图时间
 	};
+
+
+	vector<ChroAnalysed>ChroAnalysedResult;
+
 	vector <ChroTable> AllPatients;
 	vector <ChroTable> AllPatientsChose;
 	vector<int>Row;//选择分析的病人所在行数
@@ -58,6 +63,8 @@ public:
 	vector<WaitToPrint> CHROWaitPrint;
 	bool patientNewImg;
 	CString SelectedName;
+
+
 
 public:
 	virtual BOOL OnInitDialog();
@@ -97,6 +104,8 @@ public:
 	bool ShowOneResult(CString patientname);
 	// 将一个病人的分析结果显示到图表中
 	bool ShowOneResultInTable(CString patientname);
+
+
 
 	afx_msg void OnBnClickedBtnChrosolve();
 	afx_msg void OnBnClickedBtnChroprint();

@@ -541,7 +541,7 @@ PyObject* StringToPyByWin(std::string str)
 }
 //处理主函数
 MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWaitingForAna, string writename, CString patientname,
-	MN_HandleResult *pB)
+	MN_HandleResult *pB,COleDateTime GrabTime)
 {
 	////将该照片的分析结果初始
 	//string read1name1 = road1name1 + file1name1;//读取的总路径
@@ -585,8 +585,8 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 
 		//调用分析软件.exe
 		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "‪E:\\GWsystem\\111vector_predict\\x64\\Release", NULL, NULL, SW_SHOW);
-		HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_SHOW);
-		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_HIDE);
+		//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_SHOW);
+		HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_HIDE);
 		if ((int)hNewExe == ERROR_FILE_NOT_FOUND)
 		{
 			std::cout << "指定工作目录：文件找不到" << std::endl;
@@ -765,6 +765,7 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 						OnePicResult->NumCells = 2;
 						OnePicResult->NumMicro = 0;
 						OnePicResult->patientname = patientname;
+						OnePicResult->GrabTime = GrabTime;
 						//将该张照片的分析结果存到数据库
 						ReadMN.SaveOnePicMNResult(OnePicResult);
 						SaveNum++;
@@ -796,6 +797,8 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 						OnePicResult->NumCells = 2;
 						OnePicResult->NumMicro = 1;
 						OnePicResult->patientname = patientname;
+						OnePicResult->GrabTime = GrabTime;
+
 						//将该张照片的分析结果存到数据库
 						ReadMN.SaveOnePicMNResult(OnePicResult);
 						SaveNum++;

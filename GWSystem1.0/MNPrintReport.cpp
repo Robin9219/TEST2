@@ -83,9 +83,11 @@ void CMNPrintReport::OnBnClickedBtnAddmn()
 {
 	// TODO:  在此添加控件通知处理程序代码
 	//获取combox中的病人
-	CString patient = (*p)[m_comboxreportmn.GetCurSel()].patientname;
+	CString patient;
+	if (!PatientName[m_comboxreportmn.GetCurSel()].IsEmpty())
+		patient = PatientName[m_comboxreportmn.GetCurSel()];
 	string stringpatient = (CW2A)patient;
-	string path = (*p)[m_comboxreportmn.GetCurSel()].savepath + stringpatient + ".xlsx";
+	string path = "C:\\Users\\xibao\\Desktop\\report\\" + stringpatient + ".xlsx";
 	WaitToPrint combox2list;
 	combox2list.patientname = patient;
 	combox2list.savepath = path;
@@ -227,7 +229,7 @@ void CMNPrintReport::OnBnClickedBtnPaintallmn()
 			bool bLoad = excl.LoadSheet(strSheetName);
 			CString strValue;
 
-			vector<MN_HandleResult>AllChosePatient = ReadMicro.ReadAllMNResultFromAccess();
+			vector<MN_HandleResult>AllChosePatient = ReadMicro.ReadAllMNResultFromAccess(PatientInList);
 			for (size_t i = 0; i < AllChosePatient.size(); i++)
 			{
 				MN_HandleResult pA;
@@ -270,4 +272,40 @@ void CMNPrintReport::OnBnClickedBtnPaintallmn()
 		}
 
 	}
+}
+
+
+BOOL CMNPrintReport::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// TODO:  在此添加额外的初始化
+	//查询数据库中可打印的报告
+	PatientName = ReadMicro.ArrangeAllowPrintMN();
+	//画表格
+	//设置表头
+	m_listmn.SetExtendedStyle(LVS_EX_FLATSB | LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP | LVS_EX_ONECLICKACTIVATE | LVS_EX_GRIDLINES);
+	m_listmn.InsertColumn(0, _T("序号"), LVCFMT_CENTER, 60, 0);
+	m_listmn.InsertColumn(1, _T("病人名称"), LVCFMT_CENTER, 90, 0);
+	m_listmn.InsertColumn(2, _T("报表存储路径"), LVCFMT_CENTER, 480, 0);
+	m_listmn.DeleteColumn(0); //删除第0列
+	//设置行高：
+	CImageList   m_l;
+	m_l.Create(1, 18, TRUE | ILC_COLOR32, 1, 0);
+	m_listmn.SetImageList(&m_l, LVSIL_SMALL);
+
+	//设置字体：
+	CFont m_font;
+	m_font.CreatePointFont(120, _T("新宋体"));
+	m_listmn.SetFont(&m_font);
+
+	//刷新可打印报告的病人
+	m_comboxreportmn.ResetContent();
+	for (size_t i = 0; i < PatientName.size(); i++)
+	{
+		m_comboxreportmn.InsertString(i, PatientName[i]);
+	}
+	m_comboxreportmn.SetCurSel(0);
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// 异常:  OCX 属性页应返回 FALSE
 }

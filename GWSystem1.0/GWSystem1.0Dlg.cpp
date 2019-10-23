@@ -270,21 +270,21 @@ BOOL CGWSystem10Dlg::OnInitDialog()
 	ShowAllSlide.OnInitDialog();
 	MainWinImgShow.PutPicControlIntoVector();	//初始将picture控件放入数组
 
-	////硬件初始化
-	//HardwareInit.InitHardwarePara(allpara);
+	//硬件初始化
+	HardwareInit.InitHardwarePara(allpara);
 
 
-	//HWND hWnd;
-	//hWnd = GetDlgItem(IDC_VIDEOFRAME)->GetSafeHwnd();
-	//HardwareInit.OnInitDialog(hWnd);
+	HWND hWnd;
+	hWnd = GetDlgItem(IDC_VIDEOFRAME)->GetSafeHwnd();
+	HardwareInit.OnInitDialog(hWnd);
 
-	////数据库中读到的数据传给硬件
-	//AllParaSet HardPara;
-	//HardPara.HardwareParaSet(m_Scanning_Control, allpara);
+	//数据库中读到的数据传给硬件
+	AllParaSet HardPara;
+	HardPara.HardwareParaSet(m_Scanning_Control, allpara);
 
-	////手动遥感
-	//m_Scanning_Control->Handlehold_Thread_Running = true;
-	//CWinThread* _pHandlehold_Control = AfxBeginThread(Scanning_Control::Handlehold_ThreadFunc, m_Scanning_Control);
+	//手动遥感
+	m_Scanning_Control->Handlehold_Thread_Running = true;
+	CWinThread* _pHandlehold_Control = AfxBeginThread(Scanning_Control::Handlehold_ThreadFunc, m_Scanning_Control);
 
 	CRect rect;
 	GetClientRect(&rect); //取客户区大小

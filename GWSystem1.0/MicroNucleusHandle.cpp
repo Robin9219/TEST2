@@ -179,7 +179,7 @@ BOOL CMicroNucleusHandle::OnInitDialog()
 	//设置时间控件的格式
 	m_datetimebegin.SetFormat(L"yyyy-MM-dd HH:mm:ss");
 	m_datetimeend.SetFormat(L"yyyy-MM-dd HH:mm:ss");
-	COleDateTime MinTime(COleDateTime::GetCurrentTime() - COleDateTimeSpan(30, 0, 0, 0));
+	COleDateTime MinTime(COleDateTime::GetCurrentTime() - COleDateTimeSpan(90, 0, 0, 0));
 	COleDateTime MaxTime(COleDateTime::GetCurrentTime());
 	m_datetimebegin.SetRange(&MinTime, &MaxTime);
 	m_datetimeend.SetRange(&MinTime, &MaxTime);
@@ -379,7 +379,7 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 					}
 
 					pHandleDlg->AllPatientsChose[i].Result =
-						algorithm.handlemicronucleus(ImgWaitingForAna,  StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName,pB);
+						algorithm.handlemicronucleus(ImgWaitingForAna, StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName, pB, pHandleDlg->AllPatientsChose[i].GrabTime);
 					pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
 					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].MicroImgNames.size() + 1;
 					pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
@@ -424,7 +424,7 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 						}
 
 						pHandleDlg->AllPatientsChose[i].Result =
-						algorithm.handlemicronucleus(ImgWaitingForAna, StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName, pB);
+							algorithm.handlemicronucleus(ImgWaitingForAna, StrFileSolve, pHandleDlg->AllPatientsChose[i].PatientName, pB,pHandleDlg->AllPatientsChose[i].GrabTime);
 						pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
 						pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].MicroImgNames.size() + 1;
 						pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
@@ -519,13 +519,14 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 			//将分析结果存入数据库中
 			ReadAndWriteMN.SaveToAccessMNAnalysis(pHandleDlg->AllPatientsChose[i].Result);
 
-			//数据库中，将是否已经分析改为是
+			////分析完一个病人，将拨片设置表设置为已分析，并给出分析时间
+			ReadAndWriteMN.SetFinishedMN(pHandleDlg->AllPatientsChose[i].Result->patientname, pHandleDlg->AllPatientsChose[i].GrabTime);
 
 			//将表格中改成报表已生成
 			CString mystr3 = _T("√");
 			pHandleDlg->m_listmicrohandle.SetItemText(row, 5, mystr3);
-			//可以生成该病人的报表
-			pHandleDlg->MNJoinWaitToPrint(pHandleDlg->AllPatientsChose[i].Result->patientname, StrFileSolve);
+			////可以生成该病人的报表
+			//pHandleDlg->MNJoinWaitToPrint(pHandleDlg->AllPatientsChose[i].Result->patientname, StrFileSolve);
 			//图中显示该病人的分析结果
 			pHandleDlg->ShowOneResult(pHandleDlg->AllPatientsChose[i].Result->patientname);
 			//表中显示该病人的分析结果
@@ -533,12 +534,12 @@ void  CMicroNucleusHandle::ThreadProcWaitMN()
 
 			pHandleDlg->ResultRow++;
 
-			pHandleDlg->GetDlgItem(IDC_BTN_MICROPRINT)->EnableWindow(TRUE);
+		/*	pHandleDlg->GetDlgItem(IDC_BTN_MICROPRINT)->EnableWindow(TRUE);*/
 		}
 
 
 	}
-	pHandleDlg->GetDlgItem(IDC_BTN_MICROSOLVE)->EnableWindow(TRUE);
+	//pHandleDlg->GetDlgItem(IDC_BTN_MICROSOLVE)->EnableWindow(TRUE);
 
 	//判断分析是否结束
 	AnalyseFinishedMN = true;
@@ -569,7 +570,7 @@ bool CMicroNucleusHandle::ShowOneResult(CString patientname)
 	barSeries.AddXY((double)3, (double)pA.doublecell, _T("双核细胞数_校正"), RGB(0, 255, 255));
 	barSeries.AddXY((double)4, (double)pA.multiplecell, _T("多核细胞数_校正"), RGB(0, 255, 0));
 	barSeries.AddXY((double)5, pA.singleMN, _T("单核MN_校正"), RGB(255, 0, 255));
-	barSeries.AddXY((double)6, pA.DoubleMN, _T("双核MN_校正"), RGB(0, 255, 255));
+	barSeries.AddXY((double)6, pA.DoubleMN_Num, _T("双核MN_校正"), RGB(0, 255, 255));
 	barSeries.AddXY((double)7, pA.MultiMN, _T("多核MN_校正"), RGB(0, 255, 0));
 	barSeries.AddXY((double)5, pA.singlecell_wh, _T("单核MNC_校正"), RGB(255, 0, 255));
 	barSeries.AddXY((double)6, pA.doublecell_wh, _T("双核MNC_校正"), RGB(0, 255, 255));
@@ -644,7 +645,11 @@ void CMicroNucleusHandle::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 void CMicroNucleusHandle::OnBnClickedBtnMicrosolve()
 {
 	// TODO:  在此添加控件通知处理程序代码
+	pMicroNucleusResult->m_comboxpatient.ResetContent();
+	pMicroNucleusResult->m_comboxpatient.SetWindowTextW(SelectedName);
+	pMicroNucleusResult->m_comboxpatient.InsertString(0, SelectedName);
 	pMicroNucleusResult->ShowWindow(SW_SHOW);//不显示
+	pMicroNucleusResult->OnCbnSelchangeComboPatient();
 
 }
 
@@ -663,26 +668,26 @@ void CMicroNucleusHandle::DeleteAccessTable()
 	//	AfxMessageBox(e->ErrorMessage());
 	//}
 
-	sql = _T("delete  * from 微核图像分析结果数据表（已删除）");
-	try
-	{
-		m_Conn.GetRecordSet(sql);
-	}
-	catch (_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
+	//sql = _T("delete  * from 微核图像分析结果数据表（已删除）");
+	//try
+	//{
+	//	m_Conn.GetRecordSet(sql);
+	//}
+	//catch (_com_error *e)
+	//{
+	//	AfxMessageBox(e->ErrorMessage());
+	//}
 
-	//删除原数据表
-	sql = _T("delete  * from 微核分析结果数据表（本次）");
-	try
-	{
-		m_Conn.GetRecordSet(sql);
-	}
-	catch (_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
+	////删除原数据表
+	//sql = _T("delete  * from 微核分析结果数据表（本次）");
+	//try
+	//{
+	//	m_Conn.GetRecordSet(sql);
+	//}
+	//catch (_com_error *e)
+	//{
+	//	AfxMessageBox(e->ErrorMessage());
+	//}
 }
 
 //打印本次分析的报告
@@ -692,8 +697,8 @@ void CMicroNucleusHandle::OnBnClickedBtnMicroprint()
 	CMNPrintReport *pMNPrintReport = new CMNPrintReport;
 	pMNPrintReport->Create(IDD_PRINTREPORTMN, this);
 	//将当前可打印的病人传到打印界面以初始化
-	HWND   hwnd = ::FindWindow(NULL, _T("打印分析报告（微核）"));//调用消息处理函数刷新页面
-	::SendMessage(hwnd, WM_WAITTOPRINTMN, (WPARAM)&MNWaitPrint, NULL);//线程中传递定时器消息，以开启定时器，刷新显示照片
+	//HWND   hwnd = ::FindWindow(NULL, _T("打印分析报告（微核）"));//调用消息处理函数刷新页面
+	//::SendMessage(hwnd, WM_WAITTOPRINTMN, (WPARAM)&MNWaitPrint, NULL);//线程中传递定时器消息，以开启定时器，刷新显示照片
 
 	pMNPrintReport->ShowWindow(SW_SHOW);
 
@@ -743,8 +748,25 @@ void CMicroNucleusHandle::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO:  在此添加控件通知处理程序代码
 	int row = m_listmicrohandle.GetSelectionMark();
-	CString name = m_listmicrohandle.GetItemText(row, 1);
-	ShowOneResult(name);
+	CString name;
+
+	//如果分析完，将结果显示按钮点亮
+	name = m_listmicrohandle.GetItemText(row, 5);
+	if (name == _T("√"))
+	{
+		GetDlgItem(IDC_BTN_MICROSOLVE)->EnableWindow(TRUE);//有list选项选中后使删除按钮可用
+		GetDlgItem(IDC_BTN_MICROPRINT)->EnableWindow(TRUE);//有list选项选中后使删除按钮可用
+		name = m_listmicrohandle.GetItemText(row, 1);
+		ShowOneResult(name);
+		SelectedName = name;
+		
+	}
+	else
+	{
+		GetDlgItem(IDC_BTN_MICROSOLVE)->EnableWindow(FALSE);//有list选项选中后使删除按钮可用
+		GetDlgItem(IDC_BTN_MICROPRINT)->EnableWindow(FALSE);//有list选项选中后使删除按钮可用
+
+	}
 
 	*pResult = 0;
 }
@@ -874,11 +896,33 @@ void CMicroNucleusHandle::OnBnClickedBtnFindmn()
 			mystr = _T("未生成");
 			m_listmicrohandle.SetItemText(patientRow, ++j, mystr);
 			patientRow++;
+			tempMicroAllPatients[k].GrabTime = AllMNTime[pathNum_i];
 			AllPatients.push_back(tempMicroAllPatients[k]);
 		}
 
+	}
 
+	//查询图片分析结果数据表，统计已分析的结果
+	vector<MNAnalysed>AnalysedResultMN;
+	AnalysedResultMN = xx.ArrangeAnalysedMN(TimeBegin, TimeEnd);
 
+	//将已分析的结果显示到列表上
+	for (size_t k = 0; k < AnalysedResultMN.size(); k++)
+	{
+		int j = 0;
+		CString  mystr;
+		mystr.Format(_T("%d"), patientRow + 1);
+		m_listmicrohandle.InsertItem(patientRow, mystr);
+		m_listmicrohandle.SetItemText(patientRow, ++j, AnalysedResultMN[k].patientname);
+		mystr.Format(_T("%d"), AnalysedResultMN[k].MNResult.size());
+		m_listmicrohandle.SetItemText(patientRow, ++j, mystr);
+		mystr = mystr + _T("/") + mystr;
+		m_listmicrohandle.SetItemText(patientRow, ++j, mystr);
+		mystr = AnalysedResultMN[k].MNResult[0].GrabTime.Format();
+		m_listmicrohandle.SetItemText(patientRow, ++j, mystr);
+		mystr = _T("√");
+		m_listmicrohandle.SetItemText(patientRow, ++j, mystr);
+		patientRow++;
 	}
 
 

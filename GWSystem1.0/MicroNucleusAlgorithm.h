@@ -46,7 +46,7 @@ public:
 
 	//处理主函数
 	MN_HandleResult* handlemicronucleus(vector<string>ImgWaitingForAna,  string writename, CString patientname,
-		MN_HandleResult *pB);
+		MN_HandleResult *pB, COleDateTime GrabTime);
 
 	void readImgNamefromFile(char* fileName, vector <string> &imgNames);
 

@@ -67,7 +67,7 @@ CChromosomeAlgorithm::~CChromosomeAlgorithm()
 
 // //染色体分析主函数
 CHRO_HandleResult* CChromosomeAlgorithm::DicMain(vector<string>ImgWaitingForAna, string writename, CString patientname,
-	CHRO_HandleResult *pB)
+	CHRO_HandleResult *pB, COleDateTime GrabTime)
 {
 
 	FILE *fp = NULL;
@@ -97,7 +97,7 @@ CHRO_HandleResult* CChromosomeAlgorithm::DicMain(vector<string>ImgWaitingForAna,
 
 	//调用分析软件.exe
 	//HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "‪E:\\GWsystem\\111vector_predict\\x64\\Release", NULL, NULL, SW_SHOW);
-	HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseMTF\\mtf20191009.exe", NULL, NULL, SW_SHOW);
+	HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseMTF\\mtf20191009.exe", NULL, NULL, SW_HIDE);
 	if ((int)hNewExe == ERROR_FILE_NOT_FOUND)
 	{
 		std::cout << "指定工作目录：文件找不到" << std::endl;
@@ -281,6 +281,7 @@ CHRO_HandleResult* CChromosomeAlgorithm::DicMain(vector<string>ImgWaitingForAna,
 				OnePicResult.picpath =s;
 				OnePicResult.LastResult = splitImgLocResult[j];
 				OnePicResult.chromosome_num = stoi(ImgChromNum[j]);
+				OnePicResult.GrabTime = GrabTime;
 				//cout << "OnePicResult.chromosome_num" << OnePicResult.chromosome_num;
 				ReadCHRO.SaveOnePicResult(OnePicResult);
 				//统计总的双着数：

@@ -6,7 +6,7 @@
 #include "MicroNucleusResult.h"
 #include "afxdialogex.h"
 #include "ReadAndWriteForAccess.h"
-
+#include "MicroNucleusHandle.h"
 // CMicroNucleusResult 对话框
 
 IMPLEMENT_DYNAMIC(CMicroNucleusResult, CDialogEx)
@@ -127,7 +127,7 @@ END_MESSAGE_MAP()
 // CMicroNucleusResult 消息处理程序
 
 CReadAndWriteForAccess ReadAndWriteMNResult;
-
+extern CMicroNucleusHandle * pHandleDlg;
 
 //选择病人
 void CMicroNucleusResult::OnCbnSelchangeComboPatient()
@@ -143,13 +143,13 @@ void CMicroNucleusResult::OnCbnSelchangeComboPatient()
 		GetDlgItem(ID_StaticN[v])->SetWindowTextW(_T("0"));
 		GetDlgItem(ID_StaticMN[v])->SetWindowTextW(_T("0"));
 	}
-	current = m_comboxpatient.GetCurSel();
-	if (current >= 0)
-	{
+	////pHandleDlg->SelectedName
+	//if (current >= 0)
+	//{
 		//获得该病人的处理结果
-		CurrentPatientResult = ReadAndWriteMNResult.FindCurrentPatientResult(PatientNames[current]);
-		SystemResult = ReadAndWriteMNResult.ReadOneMNSystemResultFromAccess(PatientNames[current]);
-		CheckResult = ReadAndWriteMNResult.ReadOneMNResultFromAccess(PatientNames[current]);
+	CurrentPatientResult = ReadAndWriteMNResult.FindCurrentPatientResult(pHandleDlg->SelectedName);
+	SystemResult = ReadAndWriteMNResult.ReadOneMNSystemResultFromAccess(pHandleDlg->SelectedName);
+	CheckResult = ReadAndWriteMNResult.ReadOneMNResultFromAccess(pHandleDlg->SelectedName);
 
 		////查看该病人的校正结果
 		//for (size_t i = 0; i < AllCheckInformation.size(); i++)
@@ -226,7 +226,7 @@ void CMicroNucleusResult::OnCbnSelchangeComboPatient()
 		GetDlgItem(IDC_EDIT_MULMNCRG)->SetWindowTextW(mystr);
 		mystr.Format(_T("%d"), CheckResult.MultiMN);
 		GetDlgItem(IDC_EDIT_MULMNRG)->SetWindowTextW(mystr);
-	}
+	//}
 
 }
 
@@ -315,13 +315,14 @@ BOOL CMicroNucleusResult::OnInitDialog()
 	vector<CString>().swap(PatientNames);
 
 	//病人名填入ComBox
-	m_comboxpatient.ResetContent();
-	for (size_t i = 0; i < PatientNames.size(); i++)
-	{
-		m_comboxpatient.InsertString(i, PatientNames[i]);
-	}
-	m_comboxpatient.SetCurSel(0);
-	OnCbnSelchangeComboPatient();
+	//m_comboxpatient.ResetContent();
+	//for (size_t i = 0; i < PatientNames.size(); i++)
+	//{
+	//	m_comboxpatient.InsertString(i, PatientNames[i]);
+	//}
+	//m_comboxpatient.SetCurSel(0);
+
+	//OnCbnSelchangeComboPatient();
 
 	greenPen.CreatePen(PS_SOLID, 5, RGB(0, 255, 0));
 	redPen.CreatePen(PS_SOLID, 5, RGB(255, 0, 0));
@@ -1000,8 +1001,12 @@ void CMicroNucleusResult::OnBnClickedBtnNinc1()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page]);
+
+		//ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page]);
+
+
 	}
 
 
@@ -1028,8 +1033,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc2()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 1]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 1]);
 	}
 
 }
@@ -1055,8 +1060,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc3()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 2]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 2]);
 	}
 }
 
@@ -1081,8 +1086,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc4()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 3]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 3]);
 	}
 }
 
@@ -1107,8 +1112,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc5()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 4]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 4]);
 	}
 }
 
@@ -1133,8 +1138,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc6()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 5]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 5]);
 	}
 }
 
@@ -1159,8 +1164,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc7()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 6]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 6]);
 	}
 }
 
@@ -1185,8 +1190,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc8()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 7]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 7]);
 	}
 }
 
@@ -1211,8 +1216,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc9()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 8]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 8]);
 	}
 }
 
@@ -1237,8 +1242,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc10()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 9]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 9]);
 	}
 }
 
@@ -1263,8 +1268,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc11()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 10]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 10]);
 	}
 }
 
@@ -1289,8 +1294,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc12()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 11]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 11]);
 	}
 }
 
@@ -1315,8 +1320,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc13()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 12]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 12]);
 	}
 }
 
@@ -1341,8 +1346,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc14()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 13]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 13]);
 	}
 }
 
@@ -1367,8 +1372,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc15()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 14]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 14]);
 	}
 }
 
@@ -1393,8 +1398,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc16()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 15]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 15]);
 	}
 }
 
@@ -1419,8 +1424,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc17()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 16]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 16]);
 	}
 }
 
@@ -1445,8 +1450,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc18()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 17]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 17]);
 	}
 }
 
@@ -1471,8 +1476,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc19()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 18]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 18]);
 	}
 }
 
@@ -1497,8 +1502,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc20()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 19]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 19]);
 	}
 }
 
@@ -1523,8 +1528,8 @@ void CMicroNucleusResult::OnBnClickedBtnNinc21()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 20]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 20]);
 	}
 }
 
@@ -1550,8 +1555,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec1()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page]);
 	}
 }
 
@@ -1578,8 +1583,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec2()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 1]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 1]);
 	}
 }
 
@@ -1606,8 +1611,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec3()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 2]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 2]);
 	}
 
 }
@@ -1635,8 +1640,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec4()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 3]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 3]);
 	}
 
 }
@@ -1664,8 +1669,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec5()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 4]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 4]);
 	}
 
 }
@@ -1693,8 +1698,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec6()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 5]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 5]);
 	}
 
 }
@@ -1722,8 +1727,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec7()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 6]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 6]);
 	}
 
 }
@@ -1751,8 +1756,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec8()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 7]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 7]);
 	}
 
 }
@@ -1780,8 +1785,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec9()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 8]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 8]);
 	}
 
 }
@@ -1809,8 +1814,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec10()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 9]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 9]);
 	}
 
 }
@@ -1838,8 +1843,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec11()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 10]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 10]);
 	}
 
 }
@@ -1867,8 +1872,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec12()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 11]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 11]);
 	}
 
 }
@@ -1896,8 +1901,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec13()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 12]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 12]);
 	}
 
 }
@@ -1925,8 +1930,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec14()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 13]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 13]);
 	}
 
 }
@@ -1954,8 +1959,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec15()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 14]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 14]);
 	}
 
 }
@@ -1983,8 +1988,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec16()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 15]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 15]);
 	}
 
 }
@@ -2012,8 +2017,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec17()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 16]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 16]);
 	}
 
 }
@@ -2041,8 +2046,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec18()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 17]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 17]);
 	}
 
 }
@@ -2070,8 +2075,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec19()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 18]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 18]);
 	}
 
 }
@@ -2099,8 +2104,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec20()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 19]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 19]);
 	}
 
 }
@@ -2128,8 +2133,8 @@ void CMicroNucleusResult::OnBnClickedBtnNdec21()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 20]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 20]);
 	}
 
 }
@@ -2157,8 +2162,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc1()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page ]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page ]);
 	}
 }
 
@@ -2185,8 +2190,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc2()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 1]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 1]);
 	}
 }
 
@@ -2213,8 +2218,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc3()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 2]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 2]);
 	}
 
 }
@@ -2242,8 +2247,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc4()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 3]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 3]);
 	}
 
 }
@@ -2271,8 +2276,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc5()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 4]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 4]);
 	}
 
 }
@@ -2300,8 +2305,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc6()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 5]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 5]);
 	}
 
 }
@@ -2329,8 +2334,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc7()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 6]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 6]);
 	}
 
 }
@@ -2358,8 +2363,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc8()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 7]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 7]);
 	}
 
 }
@@ -2387,8 +2392,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc9()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 8]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 8]);
 	}
 
 }
@@ -2416,8 +2421,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc10()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 9]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 9]);
 	}
 
 }
@@ -2445,8 +2450,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc11()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 10]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 10]);
 	}
 
 }
@@ -2474,8 +2479,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc12()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 11]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 11]);
 	}
 
 }
@@ -2503,8 +2508,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc13()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 12]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 12]);
 	}
 
 }
@@ -2532,8 +2537,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc14()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 13]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 13]);
 	}
 
 }
@@ -2561,8 +2566,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc15()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 14]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 14]);
 	}
 
 }
@@ -2590,8 +2595,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc16()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 15]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 15]);
 	}
 
 }
@@ -2619,8 +2624,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc17()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 16]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 16]);
 	}
 
 }
@@ -2648,8 +2653,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc18()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 17]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 17]);
 	}
 
 }
@@ -2677,8 +2682,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc19()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 18]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 18]);
 	}
 
 }
@@ -2706,8 +2711,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc20()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 19]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 19]);
 	}
 
 }
@@ -2735,8 +2740,8 @@ void CMicroNucleusResult::OnBnClickedBtnMninc21()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 20]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 20]);
 	}
 
 }
@@ -2765,8 +2770,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec1()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page]);
 	}
 }
 
@@ -2793,8 +2798,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec2()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 1]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 1]);
 	}
 }
 
@@ -2821,8 +2826,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec3()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 2]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 2]);
 	}
 
 }
@@ -2850,8 +2855,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec4()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 3]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 3]);
 	}
 
 }
@@ -2879,8 +2884,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec5()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 4]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 4]);
 	}
 
 }
@@ -2908,8 +2913,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec6()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 5]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 5]);
 	}
 
 }
@@ -2937,8 +2942,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec7()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 6]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 6]);
 	}
 
 }
@@ -2966,8 +2971,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec8()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 7]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 7]);
 	}
 
 }
@@ -2995,8 +3000,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec9()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 8]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 8]);
 	}
 
 }
@@ -3024,8 +3029,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec10()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 9]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 9]);
 	}
 
 }
@@ -3053,8 +3058,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec11()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 10]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 10]);
 	}
 
 }
@@ -3082,8 +3087,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec12()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 11]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 11]);
 	}
 
 }
@@ -3111,8 +3116,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec13()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 12]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 12]);
 	}
 
 }
@@ -3140,8 +3145,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec14()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 13]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 13]);
 	}
 
 }
@@ -3169,8 +3174,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec15()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 14]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 14]);
 	}
 
 }
@@ -3198,8 +3203,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec16()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 15]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 15]);
 	}
 
 }
@@ -3227,8 +3232,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec17()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 16]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 16]);
 	}
 
 }
@@ -3256,8 +3261,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec18()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 17]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 17]);
 	}
 
 }
@@ -3285,8 +3290,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec19()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 18]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 18]);
 	}
 
 }
@@ -3314,8 +3319,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec20()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 19]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 19]);
 	}
 
 }
@@ -3343,8 +3348,8 @@ void CMicroNucleusResult::OnBnClickedBtnMndec21()
 		//显示总结果
 		ShowSumResult(result);
 		//保存结果到数据库
-		current = m_comboxpatient.GetCurSel();
-		ReadAndWriteMNResult.SaveToAccessMN(result, PatientNames[current], CurrentPatientResult[21 * Page + 20]);
+		//pHandleDlg->SelectedName
+		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 20]);
 	}
 
 }

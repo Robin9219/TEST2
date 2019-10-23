@@ -213,26 +213,26 @@ int CChromosomeHandle::DeleteAccessTable()
 	//	AfxMessageBox(e->ErrorMessage());
 	//}
 
-	sql = _T("delete  * from 染色体图像分析结果数据表（已删除）");
-	try
-	{
-		m_Conn.GetRecordSet(sql);
-	}
-	catch (_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
+	//sql = _T("delete  * from 染色体图像分析结果数据表（已删除）");
+	//try
+	//{
+	//	m_Conn.GetRecordSet(sql);
+	//}
+	//catch (_com_error *e)
+	//{
+	//	AfxMessageBox(e->ErrorMessage());
+	//}
 
 
-	sql = _T("delete  * from 染色体分析结果数据表（本次）");
-	try
-	{
-		m_Conn.GetRecordSet(sql);
-	}
-	catch (_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
+	//sql = _T("delete  * from 染色体分析结果数据表（本次）");
+	//try
+	//{
+	//	m_Conn.GetRecordSet(sql);
+	//}
+	//catch (_com_error *e)
+	//{
+	//	AfxMessageBox(e->ErrorMessage());
+	//}
 	return 0;
 }
 
@@ -286,6 +286,8 @@ void CChromosomeHandle::OnBnClickedBtnChrohandle()
 			Row.push_back(i);
 		}
 	}
+
+
 
 	thread ChroAnalyse(ThreadProcWaitCHRO);
 	ChroAnalyse.detach();
@@ -383,12 +385,13 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 						HWND   hwnd = ::FindWindow(NULL, _T("染色体处理"));//调用消息处理函数刷新页面
 						::SendMessage(hwnd, WM_INIT_TABLECHRO, (WPARAM)mystr2.AllocSysString(), (WPARAM)row);//线程中传递定时器消息，以开启定时器，刷新显示照片
 					}
-					pHandleDlg->AllPatientsChose[i].Result = algorithm.DicMain(ImgWaitingForAna, StrFileSolveChro, pHandleDlg->AllPatientsChose[i].PatientName, pB);
+					pHandleDlg->AllPatientsChose[i].Result = algorithm.DicMain(ImgWaitingForAna, StrFileSolveChro, pHandleDlg->AllPatientsChose[i].PatientName, pB, pHandleDlg->AllPatientsChose[i].GrabTime);
 					pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
 					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size() + 1;
 					pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
 					pHandleDlg->AllPatientsChose[i].Result->resultfile = pHandleDlg->AllPatientsChose[i].ResultPath;
 					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
+
 
 					alalysedNum += ImgWaitingForAna.size();
 					vector<string>().swap(ImgWaitingForAna);
@@ -444,7 +447,7 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 						::SendMessage(hwnd, WM_INIT_TABLECHRO, (WPARAM)mystr2.AllocSysString(), (WPARAM)row);//线程中传递定时器消息，以开启定时器，刷新显示照片
 					}
 
-					pHandleDlg->AllPatientsChose[i].Result = algorithm.DicMain(ImgWaitingForAna, StrFileSolveChro, pHandleDlg->AllPatientsChose[i].PatientName, pB);
+					pHandleDlg->AllPatientsChose[i].Result = algorithm.DicMain(ImgWaitingForAna, StrFileSolveChro, pHandleDlg->AllPatientsChose[i].PatientName, pB,pHandleDlg->AllPatientsChose[i].GrabTime);
 					pHandleDlg->AllPatientsChose[i].Result->patientname = pHandleDlg->AllPatientsChose[i].PatientName;
 					pHandleDlg->AllPatientsChose[i].Result->picturesum = pHandleDlg->AllPatientsChose[i].ChroImgNames.size() + 1;
 					pHandleDlg->AllPatientsChose[i].Result->sourcefile = pHandleDlg->AllPatientsChose[i].ImgPath;
@@ -556,10 +559,16 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 				
 		}
 
-		//将分析结果存入数据库中
-		ReadAndWrite.SaveToAccess(pHandleDlg->AllPatientsChose[i].Result);
-		//可以生成该病人的报表
-		pHandleDlg->CHROWaitToPrint(pHandleDlg->AllPatientsChose[i].Result->patientname, StrFileSolveChro);
+		////将一个病人的分析结果存入数据库中
+		//ReadAndWrite.SaveToAccess(pHandleDlg->AllPatientsChose[i].Result);
+
+		//由染色体小图结果统计得到病人结果，并存入数据库（本次）
+		ReadAndWrite.CountPatientResultCHRO(pHandleDlg->AllPatientsChose[i].Result->patientname, pHandleDlg->AllPatientsChose[i].GrabTime);
+
+		////分析完一个病人，将拨片设置表设置为已分析，并给出分析时间
+		ReadAndWrite.SetFinishedCHRO(pHandleDlg->AllPatientsChose[i].Result->patientname, pHandleDlg->AllPatientsChose[i].GrabTime);
+		////可以生成该病人的报表
+		//pHandleDlg->CHROWaitToPrint(pHandleDlg->AllPatientsChose[i].Result->patientname, StrFileSolveChro);
 		//将表格中改成报表已生成
 		CString mystr3 = _T("√");
 		pHandleDlg->m_listchrohandle.SetItemText(row, 5, mystr3);
@@ -569,8 +578,8 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 
 		pHandleDlg->ResultRow++;
 
-		pHandleDlg->GetDlgItem(IDC_BTN_CHROPRINT)->EnableWindow(TRUE);//无lisr选项选中使删除按钮变灰
-		pHandleDlg->GetDlgItem(IDC_BTN_CHROSOLVE)->EnableWindow(TRUE);//无lisr选项选中使删除按钮变灰
+		//pHandleDlg->GetDlgItem(IDC_BTN_CHROPRINT)->EnableWindow(TRUE);//无lisr选项选中使删除按钮变灰
+		//pHandleDlg->GetDlgItem(IDC_BTN_CHROSOLVE)->EnableWindow(TRUE);//无lisr选项选中使删除按钮变灰
 
 	}
 
@@ -598,6 +607,7 @@ bool CChromosomeHandle::ShowOneResult(CString patientname)
 	//显示到图中
 	CHRO_HandleResult pA;
 	pA = ReadAndWrite.ReadOneResultFromAccess(patientname);
+	
 	ClearAllSeries();
 	CSeries barSeries = (CSeries)m_chartchrom.Series(0);
 	barSeries.AddXY((double)1, (double)pA.allcell, _T("分析细胞总数"), RGB(255, 255, 0));
@@ -694,8 +704,10 @@ void CChromosomeHandle::OnBnClickedBtnChrosolve()
 {
 	// TODO:  在此添加控件通知处理程序代码
 	pChromosomeResult->m_comboxpatient.ResetContent();
+	pChromosomeResult->m_comboxpatient.SetWindowTextW(SelectedName);
 	pChromosomeResult->m_comboxpatient.InsertString(0, SelectedName);
 	pChromosomeResult->ShowWindow(SW_SHOW);//不显示
+	pChromosomeResult->OnCbnSelchangeComboPatientch();
 
 }
 
@@ -705,9 +717,9 @@ void CChromosomeHandle::OnBnClickedBtnChroprint()
 	// TODO:  在此添加控件通知处理程序代码
 	CCHROPrintReport *pCHPrintReport = new CCHROPrintReport;
 	pCHPrintReport->Create(IDD_PRINTREPORTCHRO, this);
-	//将当前可打印的病人传到打印界面以初始化
-	HWND   hwnd = ::FindWindow(NULL, _T("打印分析报告（染色体）"));//调用消息处理函数刷新页面
-	::SendMessage(hwnd, WM_WAITTOPRINTCHRO, (WPARAM)&CHROWaitPrint, NULL);//线程中传递定时器消息，以开启定时器，刷新显示照片
+	////将当前可打印的病人传到打印界面以初始化
+	//HWND   hwnd = ::FindWindow(NULL, _T("打印分析报告（染色体）"));//调用消息处理函数刷新页面
+	//::SendMessage(hwnd, WM_WAITTOPRINTCHRO, (WPARAM)&CHROWaitPrint, NULL);//线程中传递定时器消息，以开启定时器，刷新显示照片
 
 	pCHPrintReport->ShowWindow(SW_SHOW);
 }
@@ -735,6 +747,18 @@ void CChromosomeHandle::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 //查询
 void CChromosomeHandle::OnBnClickedBtnFindchro()
 {
+	//CReadAndWriteForAccess x;
+	//CString name = _T("rst10214");
+	//CString b = _T("2019-10-21  13:33:23");
+	//COleDateTime time;
+	//bool f = time.ParseDateTime(b, LOCALE_NOUSEROVERRIDE);
+	//cout << "f :" << f << endl;
+	//
+	//x.CountPatientResultCHRO(name, time);
+
+
+
+
 	// TODO:  在此添加控件通知处理程序代码
 	//是否有本次扫描的图片 如果有 加入
 	LoadCurrentToList();
@@ -853,9 +877,40 @@ void CChromosomeHandle::OnBnClickedBtnFindchro()
 			mystr = _T("未生成");
 			m_listchrohandle.SetItemText(patientRow, ++j, mystr);
 			patientRow++;
+			tempAllPatients[k].GrabTime = AllCHROTime[pathNum_i];
 			AllPatients.push_back(tempAllPatients[k]);
 		}
 
+	}
+
+	//查询图片分析结果数据表，统计已分析的结果
+
+
+
+
+
+
+
+	vector<ChroAnalysed>AnalysedResultCHRO;
+	AnalysedResultCHRO = xx.ArrangeAnalysedCHRO(TimeBegin, TimeEnd);
+
+	//将已分析的结果显示到列表上
+	for (size_t k = 0; k < AnalysedResultCHRO.size(); k++)
+	{
+		int j = 0;
+		CString  mystr;
+		mystr.Format(_T("%d"), patientRow + 1);
+		m_listchrohandle.InsertItem(patientRow, mystr);
+		m_listchrohandle.SetItemText(patientRow, ++j, AnalysedResultCHRO[k].patientname);
+		mystr.Format(_T("%d"), AnalysedResultCHRO[k].ChromosomeResult.size());
+		m_listchrohandle.SetItemText(patientRow, ++j, mystr);
+		mystr = mystr + _T("/") + mystr;
+		m_listchrohandle.SetItemText(patientRow, ++j, mystr);
+		mystr = AnalysedResultCHRO[k].ChromosomeResult[0].GrabTime.Format();
+		m_listchrohandle.SetItemText(patientRow, ++j, mystr);
+		mystr = _T("√");
+		m_listchrohandle.SetItemText(patientRow, ++j, mystr);
+		patientRow++;
 	}
 
 
@@ -898,16 +953,24 @@ void CChromosomeHandle::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO:  在此添加控件通知处理程序代码
 	int row = m_listchrohandle.GetSelectionMark();
-	CString name = m_listchrohandle.GetItemText(row, 1);
-	ShowOneResult(name);
-	SelectedName = name;
+	CString name;
 
 	//如果分析完，将结果显示按钮点亮
 	name = m_listchrohandle.GetItemText(row, 5);
 	if (name == _T("√"))
+	{
 		GetDlgItem(IDC_BTN_CHROSOLVE)->EnableWindow(TRUE);//有list选项选中后使删除按钮可用
+		GetDlgItem(IDC_BTN_CHROPRINT)->EnableWindow(TRUE);//有list选项选中后使删除按钮可用
+		name = m_listchrohandle.GetItemText(row, 1);
+		ShowOneResult(name);
+		SelectedName = name;
+	}
 	else
+	{
 		GetDlgItem(IDC_BTN_CHROSOLVE)->EnableWindow(FALSE);//有list选项选中后使删除按钮可用
+		GetDlgItem(IDC_BTN_CHROPRINT)->EnableWindow(FALSE);//有list选项选中后使删除按钮可用
+
+	}
 
 
 	*pResult = 0;
@@ -1245,3 +1308,4 @@ void CChromosomeHandle::OnNMClickListResultchro(NMHDR *pNMHDR, LRESULT *pResult)
 	ShowOneResult(name);
 	*pResult = 0;
 }
+

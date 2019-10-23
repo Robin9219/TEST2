@@ -59,6 +59,7 @@ public:
 		MN_HandleResult *Result;
 		CString ImgPath; //分析图片路径
 		CString ResultPath; //结果存储路径
+		COleDateTime GrabTime;//拍图时间
 
 	};
 	vector <MicroTable> AllPatients;
@@ -73,6 +74,7 @@ public:
 	vector<WaitToPrint> MNWaitPrint;
 	bool patientNewImg;
 	vector<int>PatientSlideNum;//该病人对应的玻片号数组
+	CString SelectedName;
 
 
 	afx_msg LRESULT InitialList1(WPARAM wParam, LPARAM lParam);//传递处理文件夹路径与储存文件夹路径
