@@ -1198,7 +1198,7 @@ MN_HandleResult CReadAndWriteForAccess::ReadOneMNResultFromAccess(CString patien
 
 	//11
 	str = m_Conn.m_pRecordset->GetCollect(_T("双核MN_校正"));
-	pA.DoubleMN_Num = _ttof(str);
+	pA.DoubleMN_Num = _ttoi(str);
 
 
 	//12
@@ -1420,7 +1420,7 @@ vector<MN_HandleResult> CReadAndWriteForAccess::ReadAllMNResultFromAccess(vector
 					OneChosePatient.SingleMNC_Num = _ttoi(mystr);
 
 					mystr = m_Conn.m_pRecordset->GetCollect(_T("单核微核细胞率_校正"));
-					OneChosePatient.SingleMNC_Rate = _ttoi(mystr);
+					OneChosePatient.SingleMNC_Rate = _ttof(mystr);
 
 					mystr = m_Conn.m_pRecordset->GetCollect(_T("单核微核率_校正"));
 					OneChosePatient.SingleMN_Rate = _ttof(mystr);
@@ -1429,10 +1429,10 @@ vector<MN_HandleResult> CReadAndWriteForAccess::ReadAllMNResultFromAccess(vector
 					OneChosePatient.DoubleMN = _ttoi(mystr);
 
 					mystr = m_Conn.m_pRecordset->GetCollect(_T("双核微核细胞率_校正"));
-					OneChosePatient.DoubleMNC_Rate = _ttoi(mystr);
+					OneChosePatient.DoubleMNC_Rate = _ttof(mystr);
 
 					mystr = m_Conn.m_pRecordset->GetCollect(_T("双核微核率_校正"));
-					OneChosePatient.DoubleMN_Rate = _ttoi(mystr);
+					OneChosePatient.DoubleMN_Rate = _ttof(mystr);
 
 					mystr = m_Conn.m_pRecordset->GetCollect(_T("双核MNC_校正"));
 					OneChosePatient.DoubleMNC_Num = _ttoi(mystr);
@@ -1485,13 +1485,13 @@ bool CReadAndWriteForAccess::SaveToAccessMNAnalysis(MN_HandleResult * pb)
 		m_Conn.m_pRecordset->PutCollect(_T("双核细胞数"), _variant_t(pb->doublecell));
 		m_Conn.m_pRecordset->PutCollect(_T("多核细胞数"), _variant_t(pb->multiplecell));
 		m_Conn.m_pRecordset->PutCollect(_T("单核MN"), _variant_t(pb->singleMN));
-		m_Conn.m_pRecordset->PutCollect(_T("单核MNC"), _variant_t(pb->SingleMNC_Num));
+		m_Conn.m_pRecordset->PutCollect(_T("单核MNC"), _variant_t(pb->singlecell_wh));
 		m_Conn.m_pRecordset->PutCollect(_T("单核微核细胞率"), _variant_t(pb->SingleMNC_Rate));
 		m_Conn.m_pRecordset->PutCollect(_T("单核微核率"), _variant_t(pb->SingleMN_Rate));
 		m_Conn.m_pRecordset->PutCollect(_T("双核MN"), _variant_t(pb->DoubleMN));
 		m_Conn.m_pRecordset->PutCollect(_T("双核微核细胞率"), _variant_t(pb->DoubleMNC_Rate));
 		m_Conn.m_pRecordset->PutCollect(_T("双核微核率"), _variant_t(pb->DoubleMN_Rate));
-		m_Conn.m_pRecordset->PutCollect(_T("双核MNC"), _variant_t(pb->DoubleMNC_Num));
+		m_Conn.m_pRecordset->PutCollect(_T("双核MNC"), _variant_t(pb->doublecell_wh));
 		m_Conn.m_pRecordset->PutCollect(_T("多核MNC"), _variant_t(pb->multiplecell_wh));
 		m_Conn.m_pRecordset->PutCollect(_T("多核MN"), _variant_t(pb->MultiMN));
 		//m_Conn.m_pRecordset->PutCollect(_T("多核微核细胞率"), _variant_t(pb->whcellrate));
@@ -1518,13 +1518,13 @@ bool CReadAndWriteForAccess::SaveToAccessMNAnalysis(MN_HandleResult * pb)
 		m_Conn.m_pRecordset->PutCollect(_T("双核细胞数_校正"), _variant_t(pb->doublecell));
 		m_Conn.m_pRecordset->PutCollect(_T("多核细胞数_校正"), _variant_t(pb->multiplecell));
 		m_Conn.m_pRecordset->PutCollect(_T("单核MN_校正"), _variant_t(pb->singleMN));
-		m_Conn.m_pRecordset->PutCollect(_T("单核MNC_校正"), _variant_t(pb->SingleMNC_Num));
+		m_Conn.m_pRecordset->PutCollect(_T("单核MNC_校正"), _variant_t(pb->singlecell_wh));
 		m_Conn.m_pRecordset->PutCollect(_T("单核微核细胞率_校正"), _variant_t(pb->SingleMNC_Rate));
 		m_Conn.m_pRecordset->PutCollect(_T("单核微核率_校正"), _variant_t(pb->SingleMN_Rate));
 		m_Conn.m_pRecordset->PutCollect(_T("双核MN_校正"), _variant_t(pb->DoubleMN));
 		m_Conn.m_pRecordset->PutCollect(_T("双核微核细胞率_校正"), _variant_t(pb->DoubleMNC_Rate));
 		m_Conn.m_pRecordset->PutCollect(_T("双核微核率_校正"), _variant_t(pb->DoubleMN_Rate));
-		m_Conn.m_pRecordset->PutCollect(_T("双核MNC_校正"), _variant_t(pb->DoubleMNC_Num));
+		m_Conn.m_pRecordset->PutCollect(_T("双核MNC_校正"), _variant_t(pb->doublecell_wh));
 		m_Conn.m_pRecordset->PutCollect(_T("多核MNC_校正"), _variant_t(pb->multiplecell_wh));
 		m_Conn.m_pRecordset->PutCollect(_T("多核MN_校正"), _variant_t(pb->MultiMN));
 		//m_Conn.m_pRecordset->PutCollect(_T("多核微核细胞率"), _variant_t(pb->whcellrate));

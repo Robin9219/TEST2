@@ -7,6 +7,8 @@
 #include "afxdialogex.h"
 #include "ReadAndWriteForAccess.h"
 #include "MicroNucleusHandle.h"
+
+
 // CMicroNucleusResult 对话框
 
 IMPLEMENT_DYNAMIC(CMicroNucleusResult, CDialogEx)
@@ -28,6 +30,7 @@ void CMicroNucleusResult::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_PATIENT, m_comboxpatient);
 	DDX_Control(pDX, IDC_EDIT_PAGEMN, m_page);
+	DDX_Control(pDX, IDC_BTN_NInc1, m_ninc1);
 }
 
 
@@ -147,8 +150,11 @@ void CMicroNucleusResult::OnCbnSelchangeComboPatient()
 	//if (current >= 0)
 	//{
 		//获得该病人的处理结果
+	//图像分析表中读取当前病人图片结果
 	CurrentPatientResult = ReadAndWriteMNResult.FindCurrentPatientResult(pHandleDlg->SelectedName);
+	//本次分析表中读取系统分析结果
 	SystemResult = ReadAndWriteMNResult.ReadOneMNSystemResultFromAccess(pHandleDlg->SelectedName);
+	//本次分析表中读取人工校正结果
 	CheckResult = ReadAndWriteMNResult.ReadOneMNResultFromAccess(pHandleDlg->SelectedName);
 
 		////查看该病人的校正结果
@@ -208,24 +214,40 @@ void CMicroNucleusResult::OnCbnSelchangeComboPatient()
 
 
         //人工校正
-		mystr.Format(_T("%d"), CheckResult.singlecell);
+		//mystr.Format(_T("%d"), CheckResult.singlecell);
+		//GetDlgItem(IDC_EDIT_SIGCELLRG)->SetWindowTextW(mystr);
+		//mystr.Format(_T("%d"), CheckResult.SingleMNC_Num);
+		//GetDlgItem(IDC_EDIT_SIGMNCRG)->SetWindowTextW(mystr);
+		//mystr.Format(_T("%d"), CheckResult.SingleMN_Num);
+		//GetDlgItem(IDC_EDIT_SIGMNRG)->SetWindowTextW(mystr);
+		//mystr.Format(_T("%d"), CheckResult.doublecell);
+		//GetDlgItem(IDC_EDIT_DOUCELLRG)->SetWindowTextW(mystr);
+		//mystr.Format(_T("%d"), CheckResult.DoubleMNC_Num);
+		//GetDlgItem(IDC_EDIT_DOUMNCRG)->SetWindowTextW(mystr);
+		//mystr.Format(_T("%d"), CheckResult.DoubleMN);
+		//GetDlgItem(IDC_EDIT_DOUMN)->SetWindowTextW(mystr);
+		//mystr.Format(_T("%d"), CheckResult.multiplecell);
+		//GetDlgItem(IDC_EDIT_MULCELLRG)->SetWindowTextW(mystr);
+		//mystr.Format(_T("%d"), CheckResult.multiplecell_wh);
+		//GetDlgItem(IDC_EDIT_MULMNCRG)->SetWindowTextW(mystr);
+		//mystr.Format(_T("%d"), CheckResult.MultiMN);
+		//GetDlgItem(IDC_EDIT_MULMNRG)->SetWindowTextW(mystr);
+
+		mystr = _T("0");
 		GetDlgItem(IDC_EDIT_SIGCELLRG)->SetWindowTextW(mystr);
-		mystr.Format(_T("%d"), CheckResult.SingleMNC_Num);
 		GetDlgItem(IDC_EDIT_SIGMNCRG)->SetWindowTextW(mystr);
-		mystr.Format(_T("%d"), CheckResult.SingleMN_Num);
 		GetDlgItem(IDC_EDIT_SIGMNRG)->SetWindowTextW(mystr);
-		mystr.Format(_T("%d"), CheckResult.doublecell);
 		GetDlgItem(IDC_EDIT_DOUCELLRG)->SetWindowTextW(mystr);
-		mystr.Format(_T("%d"), CheckResult.DoubleMNC_Num);
 		GetDlgItem(IDC_EDIT_DOUMNCRG)->SetWindowTextW(mystr);
-		mystr.Format(_T("%d"), CheckResult.DoubleMN);
 		GetDlgItem(IDC_EDIT_DOUMN)->SetWindowTextW(mystr);
-		mystr.Format(_T("%d"), CheckResult.multiplecell);
 		GetDlgItem(IDC_EDIT_MULCELLRG)->SetWindowTextW(mystr);
-		mystr.Format(_T("%d"), CheckResult.multiplecell_wh);
 		GetDlgItem(IDC_EDIT_MULMNCRG)->SetWindowTextW(mystr);
-		mystr.Format(_T("%d"), CheckResult.MultiMN);
 		GetDlgItem(IDC_EDIT_MULMNRG)->SetWindowTextW(mystr);
+
+		//计算求和(校正至当前页面的结果)
+		MN_HandleResult * result = CalculateMNResult(CurrentPatientResult);
+		//显示总结果
+		ShowSumResult(result);
 	//}
 
 }
@@ -328,7 +350,141 @@ BOOL CMicroNucleusResult::OnInitDialog()
 	redPen.CreatePen(PS_SOLID, 5, RGB(255, 0, 0));
 	whitePen.CreatePen(PS_SOLID, 5, RGB(255, 255, 255));
 
+	//设置字体：
+	CFont m_font;
+	//m_font.CreateFont(100,							 // 字体高度
+	//	0,							 // 字体宽度
+	//	0,							 // 字体倾斜角
+	//	0,							 // 字体倾斜角
+	//	FW_BOLD,	// 字体的粗细
+	//	FALSE,						 // 字体是否为斜体
+	//	FALSE,						 // 字体是否有下划线
+	//	0,							 // 字体是否有删除线
+	//	ANSI_CHARSET,				         // 字体使用的字符集
+	//	OUT_DEFAULT_PRECIS,		     	                 // 指定如何选择合适的字体
+	//	CLIP_DEFAULT_PRECIS,    		                 // 确定裁剪的精度
+	//	DEFAULT_QUALITY,			                 // 怎么样跟选择的字体相符合
+	//	DEFAULT_PITCH | FF_SWISS,	                         // 间距标志和属性标志
+	//	_T("楷体"));				         // 字体的名称
+	m_font.CreatePointFont(150, _T("微软雅黑"));
 
+	GetDlgItem(IDC_BTN_NInc1)->SetFont(&m_font);
+	GetDlgItem(IDC_BTN_NDec1)->SetFont(&m_font);
+	GetDlgItem(IDC_BTN_MNInc1)->SetFont(&m_font);
+	GetDlgItem(IDC_BTN_MNDec1)->SetFont(&m_font);
+
+
+	GetDlgItem(IDC_STA_N1)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N2)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N3)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N4)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N5)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N6)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N7)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N8)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N9)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N10)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N11)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N12)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N13)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N14)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N15)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N16)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N17)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N18)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N19)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N20)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_N21)->SetFont(&m_font);
+
+	GetDlgItem(IDC_STA_MN1)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN2)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN3)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN4)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN5)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN6)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN7)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN8)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN9)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN10)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN11)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN12)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN13)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN14)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN15)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN16)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN17)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN18)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN19)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN20)->SetFont(&m_font);
+	GetDlgItem(IDC_STA_MN21)->SetFont(&m_font);
+
+	CFont my_font1;
+	my_font1.CreatePointFont(150, _T("微软雅黑"));
+	GetDlgItem(IDC_STA_ANAMN)->SetFont(&my_font1);
+	GetDlgItem(IDC_STA_CHECKMN)->SetFont(&my_font1);
+	CFont my_font2;
+	my_font2.CreatePointFont(150, _T("微软雅黑"));
+	GetDlgItem(IDC_STA_SINGLECELL)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_DOUBLECELL)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_MULTICELL)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_STA_SINGLEMNC)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_DOUBLEMNC)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_MULTIMNC)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_STA_SINGLEMN)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_DOUBLEMN)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_MULTIMN)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_STA_SINGLECELLRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_DOUBLECELLRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_MULTICELLRG)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_STA_SINGLEMNCRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_DOUBLEMNCRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_MULTIMNCRG)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_STA_SINGLEMNRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_DOUBLEMNRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_STA_MULTIMNRG)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_EDIT_SINGLECELL)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_DOUBLECELL)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_MULTICELL)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_EDIT_SINGLEMNC)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_DOUBLEMNC)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_MULTIMNC)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_EDIT_SINGLEMN)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_DOUBLEMN)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_MULTIMN)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_EDIT_SIGCELLRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_DOUCELLRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_MULCELLRG)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_EDIT_SIGMNCRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_DOUMNCRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_MULMNCRG)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_EDIT_SIGMNRG)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_DOUMN)->SetFont(&my_font2);
+	GetDlgItem(IDC_EDIT_MULMNRG)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_EDIT_PAGEMN)->SetFont(&my_font2);
+	GetDlgItem(IDC_BTN_LASTMN)->SetFont(&my_font2);
+	GetDlgItem(IDC_BTN_NEXTMN)->SetFont(&my_font2);
+	GetDlgItem(IDR_MAINFRAME)->SetFont(&my_font2);
+
+	GetDlgItem(IDC_STA_NAMEMN)->SetFont(&my_font2);
+	GetDlgItem(IDC_COMBO_PATIENT)->SetFont(&my_font2);
+	
+	//按钮颜色
+	//m_ninc1.m_bTransparent = FALSE;
+	//m_ninc1.m_bDontUseWinXPTheme = TRUE;
+	//m_ninc1.SetTextColor(RGB(255, 0, 0));
+	
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常:  OCX 属性页应返回 FALSE
 }
@@ -454,6 +610,10 @@ void CMicroNucleusResult::OnBnClickedBtnLastmn()
 	}
 	ShowCurrentPatientResult(CurrentPatientResult, Page);
 
+	//计算求和(校正至当前页面的结果)
+	MN_HandleResult * result = CalculateMNResult(CurrentPatientResult);
+	//显示总结果
+	ShowSumResult(result);
 }
 
 //下一页
@@ -505,9 +665,14 @@ void CMicroNucleusResult::OnBnClickedBtnNextmn()
 	
 	ShowCurrentPatientResult(CurrentPatientResult, Page);
 
+
+	//计算求和(校正至当前页面的结果)
+	MN_HandleResult * result = CalculateMNResult(CurrentPatientResult);
+	//显示总结果
+	ShowSumResult(result);
 }
 
-// 计算当前病人的结果  刷新
+// 计算当前病人的结果  刷新（到当前校正页面位置）
 MN_HandleResult * CMicroNucleusResult::CalculateMNResult(vector<MN_HandleResultOnePic> currentpatientresult)
 {
 	MN_HandleResult * pB = new MN_HandleResult;
@@ -515,49 +680,53 @@ MN_HandleResult * CMicroNucleusResult::CalculateMNResult(vector<MN_HandleResultO
 	memset(pB->DoubleCellsWithMN, 0, sizeof(pB->DoubleCellsWithMN));
 	memset(pB->MultiCellsWithMN, 0, sizeof(pB->MultiCellsWithMN));
 	memset(pB->TripleCellsWithMN, 0, sizeof(pB->TripleCellsWithMN));
-	for (size_t i = 0; i < currentpatientresult.size(); i++)
+	for (size_t i = 0; i < 21 * (Page+1); i++)
 	{
-		switch (currentpatientresult[i].NumCells)
+		if (21 * (Page + 1) <= currentpatientresult.size())
 		{
-		case 0:
-			break;
-		case 1:
-			pB->SingleCellsWithMN[currentpatientresult[i].NumMicro]++;
-			pB->singlecell++;
-			pB->sumcell++;
-			if (currentpatientresult[i].NumMicro > 0)
+			switch (currentpatientresult[i].NumCells)
 			{
-				pB->singlecell_wh++;//含有微核的单核细胞数
+			case 0:
+				break;
+			case 1:
+				pB->SingleCellsWithMN[currentpatientresult[i].NumMicro]++;
+				pB->singlecell++;
+				pB->sumcell++;
+				if (currentpatientresult[i].NumMicro > 0)
+				{
+					pB->singlecell_wh++;//含有微核的单核细胞数
+				}
+				break;
+			case 2:
+				pB->DoubleCellsWithMN[currentpatientresult[i].NumMicro]++;
+				pB->doublecell++;
+				pB->sumcell++;
+				if (currentpatientresult[i].NumMicro > 0)
+				{
+					pB->doublecell_wh++;//含有微核的单核细胞数
+				}
+				break;
+			case 3:
+				pB->TripleCellsWithMN[currentpatientresult[i].NumMicro]++;
+				pB->multiplecell++;
+				pB->sumcell++;
+				if (currentpatientresult[i].NumMicro > 0)
+				{
+					pB->multiplecell_wh++;//含有微核的单核细胞数
+				}
+				break;
+			default:
+				pB->MultiCellsWithMN[currentpatientresult[i].NumMicro]++;
+				pB->multiplecell++;
+				pB->sumcell++;
+				if (currentpatientresult[i].NumMicro > 0)
+				{
+					pB->multiplecell_wh++;//含有微核的单核细胞数
+				}
+				break;
 			}
-			break;
-		case 2:
-			pB->DoubleCellsWithMN[currentpatientresult[i].NumMicro]++;
-			pB->doublecell++;
-			pB->sumcell++;
-			if (currentpatientresult[i].NumMicro > 0)
-			{
-				pB->doublecell_wh++;//含有微核的单核细胞数
-			}
-			break;
-		case 3:
-			pB->TripleCellsWithMN[currentpatientresult[i].NumMicro]++;
-			pB->multiplecell++;
-			pB->sumcell++;
-			if (currentpatientresult[i].NumMicro > 0)
-			{
-				pB->multiplecell_wh++;//含有微核的单核细胞数
-			}
-			break;
-		default:
-			pB->MultiCellsWithMN[currentpatientresult[i].NumMicro]++;
-			pB->multiplecell++;
-			pB->sumcell++;
-			if (currentpatientresult[i].NumMicro > 0)
-			{
-				pB->multiplecell_wh++;//含有微核的单核细胞数
-			}
-			break;
 		}
+
 
 	}
 	for (size_t i = 0; i < sizeof(pB->DoubleCellsWithMN)/4; i++)
@@ -604,7 +773,7 @@ void CMicroNucleusResult::ShowSumResult(MN_HandleResult * result)
 	CString mystr;
 	mystr.Format(_T("%d"), result->singlecell);
 	GetDlgItem(IDC_EDIT_SIGCELLRG)->SetWindowTextW(mystr);
-	mystr.Format(_T("%d"), result->doublecell_wh);
+	mystr.Format(_T("%d"), result->singlecell_wh);
 	GetDlgItem(IDC_EDIT_SIGMNCRG)->SetWindowTextW(mystr);
 	mystr.Format(_T("%d"), result->singleMN);
 	GetDlgItem(IDC_EDIT_SIGMNRG)->SetWindowTextW(mystr);
@@ -671,304 +840,309 @@ void CMicroNucleusResult::OnBnClickedOk()
 HBRUSH CMicroNucleusResult::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+	auto MyRGB_N = RGB(0, 0, 255);
 	// TODO:  在此更改 DC 的任何特性
 	if (IDC_STA_N1 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[0] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N2 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[1] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N3 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[2] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N4 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[3] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N5 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[4] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N6 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[5] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N7 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[6] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N8 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[7] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N9 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[8] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N10 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[9] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N11 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[10] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N12 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[11] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N13 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[12] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N14 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[13] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N15 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[14] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N16 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[15] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N17 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[16] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N18 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[17] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N19 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[18] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N20 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[19] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 	if (IDC_STA_N21 == pWnd->GetDlgCtrlID())
 	{
 		if (m_Checked[20] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_N);
 	}
 
 
 	//checke_Micro
+	auto MyRGB_MN = RGB(0,150,0);
 	if (IDC_STA_MN1 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[0] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN2 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[1] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN3 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[2] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN4 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[3] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN5 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[4] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN6 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[5] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN7 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[6] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN8 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[7] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN9 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[8] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN10 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[9] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN11 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[10] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN12 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[11] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN13 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[12] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN14 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[13] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN15 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[14] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN16 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[15] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN17 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[16] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN18 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[17] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN19 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[18] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN20 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[19] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
 	if (IDC_STA_MN21 == pWnd->GetDlgCtrlID())
 	{
 		if (m_MicroCheck[20] == true)
 			pDC->SetTextColor(RGB(255, 0, 0));
 		else
-			pDC->SetTextColor(RGB(0, 0, 0));
+			pDC->SetTextColor(MyRGB_MN);
 	}
+
+
+
 
 	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
 	return hbr;
@@ -996,7 +1170,7 @@ void CMicroNucleusResult::OnBnClickedBtnNinc1()
 		CString str;
 		str.Format(_T("%d"), CurrentPatientResult[21 * Page].NumCells);
 		GetDlgItem(ID_StaticN[0])->SetWindowTextW(str);
-		//计算求和
+		//计算求和(校正至当前页面的结果)
 		MN_HandleResult * result = CalculateMNResult(CurrentPatientResult);
 		//显示总结果
 		ShowSumResult(result);

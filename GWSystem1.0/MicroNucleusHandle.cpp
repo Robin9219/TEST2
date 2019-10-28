@@ -594,22 +594,22 @@ bool CMicroNucleusHandle::ShowOneResultInTable(CString patientname)
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
 	mystr.Format(_T("%d"), pA.SingleMNC_Num);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
-	mystr.Format(_T("%.2f"), pA.SingleMNC_Rate);
+	mystr.Format(_T("%.2f"), pA.SingleMNC_Rate * 1000);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
 	mystr.Format(_T("%d"), pA.SingleMN_Num);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
-	mystr.Format(_T("%.2f"), pA.SingleMN_Rate);
+	mystr.Format(_T("%.2f"), pA.SingleMN_Rate * 1000);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
 
 	mystr.Format(_T("%d"), pA.doublecell);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
 	mystr.Format(_T("%d"), pA.DoubleMNC_Num);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
-	mystr.Format(_T("%.2f"), pA.DoubleMNC_Rate);
+	mystr.Format(_T("%.2f"), pA.DoubleMNC_Rate *1000);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr );
 	mystr.Format(_T("%d"), pA.DoubleMN_Num);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
-	mystr.Format(_T("%.2f"), pA.DoubleMN_Rate);
+	mystr.Format(_T("%.2f"), pA.DoubleMN_Rate *1000);
 	m_resultchrolist.SetItemText(ResultRow, ++j, mystr);
 
 	//UpdateData(false);
@@ -758,6 +758,7 @@ void CMicroNucleusHandle::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 		GetDlgItem(IDC_BTN_MICROPRINT)->EnableWindow(TRUE);//有list选项选中后使删除按钮可用
 		name = m_listmicrohandle.GetItemText(row, 1);
 		ShowOneResult(name);
+		ShowOneResultInTable(name);
 		SelectedName = name;
 		
 	}

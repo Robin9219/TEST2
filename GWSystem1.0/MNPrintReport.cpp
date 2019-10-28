@@ -147,13 +147,13 @@ bool CMNPrintReport::MakeOneReporte(CString patientname, string path)
 
 	strValue.Format(_T("%d"), pA.DoubleMNC_Num);
 	excl.SetCellString(8, 13, strValue);
-	strValue.Format(_T("%.2f"), pA.DoubleMNC_Rate);
+	strValue.Format(_T("%.2f"), pA.DoubleMNC_Rate*1000);
 	CString str = strValue;
 	excl.SetCellString(8, 14, str);
 
-	strValue.Format(_T("%d"), pA.DoubleMN);
+	strValue.Format(_T("%d"), pA.DoubleMN_Num);
 	excl.SetCellString(8, 15, strValue);
-	strValue.Format(_T("%.2f"), pA.DoubleMN_Rate);
+	strValue.Format(_T("%.2f"), pA.DoubleMN_Rate*1000);
 	str = strValue;
 	excl.SetCellString(8, 16, str);
 
@@ -241,18 +241,18 @@ void CMNPrintReport::OnBnClickedBtnPaintallmn()
 				strValue = pA.patientname;
 				excl.SetCellString(7 + i, 3, strValue); //姓名
 				strValue.Format(_T("%d"), pA.doublecell);
-				excl.SetCellString(6+i, 5, strValue); //分析细胞总数
+				excl.SetCellString(7+i, 5, strValue); //分析细胞总数
 
 
 				strValue.Format(_T("%d"), pA.DoubleMNC_Num);
 				excl.SetCellString(7 + i, 10, strValue);
-				strValue.Format(_T("%.2f"), pA.DoubleMNC_Rate);
+				strValue.Format(_T("%.2f"), pA.DoubleMNC_Rate *1000);
 				CString str = strValue;
 				excl.SetCellString(7 + i, 11, str);
 
 				strValue.Format(_T("%d"), pA.DoubleMN);
 				excl.SetCellString(7 + i, 12, strValue);
-				strValue.Format(_T("%.2f"), pA.DoubleMN_Rate);
+				strValue.Format(_T("%.2f"), pA.DoubleMN_Rate *1000);
 				str = strValue ;
 				excl.SetCellString(7 + i, 13, str);
 

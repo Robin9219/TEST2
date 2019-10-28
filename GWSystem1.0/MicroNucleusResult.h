@@ -8,6 +8,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/video/video.hpp>
 #include "CvvImage.h"
+#include "afxbutton.h"
 
 // CMicroNucleusResult ¶Ô»°¿ò
 
@@ -170,4 +171,6 @@ public:
 	afx_msg void OnBnClickedBtnMndec19();
 	afx_msg void OnBnClickedBtnMndec20();
 	afx_msg void OnBnClickedBtnMndec21();
+
+	CMFCButton m_ninc1;
 };

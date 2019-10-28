@@ -396,4 +396,9 @@ string CStringtoString(CString cs);
 
 CString stringtoCString(string str);
 
+char* TCHAR2char(const TCHAR* STR);
+
+TCHAR* char2TCAHR(const char* str);
+
+
 extern CGWSystem10App theApp;

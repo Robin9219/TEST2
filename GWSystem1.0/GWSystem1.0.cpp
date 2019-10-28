@@ -84,8 +84,8 @@ BOOL CGWSystem10App::InitInstance()
 	//SetCurrentDirectory(sName.c_str());
 
 #ifdef RELEASE_DEBUG	//开启控制控制台
-	//AllocConsole();//注意检查返回值
-	//freopen("CONOUT$", "w", stdout);
+	AllocConsole();//注意检查返回值
+	freopen("CONOUT$", "w", stdout);
 
 	//登录
 #endif
@@ -243,4 +243,38 @@ CString stringtoCString(string str) {
 	ans.Format("%s", str.c_str());
 	return ans;
 #endif // _UNICODE  
+}
+
+char* TCHAR2char(const TCHAR* STR)
+
+{
+
+	//返回字符串的长度
+
+	int size = WideCharToMultiByte(CP_ACP, 0, STR, -1, NULL, 0, NULL, FALSE);
+
+	//申请一个多字节的字符串变量
+
+	char* str = new char[sizeof(char)* size];
+
+	//将STR转成str
+
+	WideCharToMultiByte(CP_ACP, 0, STR, -1, str, size, NULL, FALSE);
+
+	return str;
+
+}
+
+TCHAR* char2TCAHR(const char* str)
+
+{
+
+	int size = MultiByteToWideChar(CP_ACP, 0, str, -1, NULL, 0);
+
+	TCHAR* retStr = new TCHAR[size * sizeof(TCHAR)];
+
+	MultiByteToWideChar(CP_ACP, 0, str, -1, retStr, size);
+
+	return retStr;
+
 }

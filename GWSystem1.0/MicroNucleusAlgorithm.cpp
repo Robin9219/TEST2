@@ -571,6 +571,40 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 		}
 		fclose(fp);
 
+
+		string resultname3;
+		string resultname4;
+		//获得该批次的第一张图片路径
+		if (!ImgWaitingForAna[0].empty())
+		{
+			//
+			int pos0_5 = ImgWaitingForAna[0].rfind("\\"); //, s_file_path.length()
+			string fn0_5 = ImgWaitingForAna[0].substr(0, pos0_5 + 1);//读取路径，除了文件名称
+
+			int pos0_4 = ImgWaitingForAna[0].rfind("_"); //, s_file_path.length()
+			string fn0_4 = ImgWaitingForAna[0].substr(0, pos0_4 + 1);//读取路径，除了文件名称
+			string fn1_3 = ImgWaitingForAna[0].substr(pos0_4 + 1, ImgWaitingForAna[0].length());//读取路径最后的文件名,仅保留数字名字，不要中文
+
+
+			//新建文件夹存放所有的批次细胞，统一进行预测分析！！
+			string resultname1 = fn0_5 + fn1_3 + "totall-cells";//读取的文件名 
+			const char* result_s1 = resultname1.c_str();//将路径转换成 const char
+
+
+			string resultname2 = resultname1 + "\\fuhe";//读取的文件名 
+			const char* result_s2 = resultname2.c_str();//将路径转换成 const char
+	
+
+			resultname3 = resultname1 + "\\wuhei-fuhe\\";//读取的文件名 
+			const char* result_s3 = resultname3.c_str();//将路径转换成 const char
+			cout << "resultname3" << resultname3<<endl;
+
+			resultname4 = resultname1 + "\\fuhe\\singles\\";//读取的文件名 
+			const char* result_s4 = resultname4.c_str();//将路径转换成 const char
+			cout << "resultname4" << resultname4 << endl;
+
+		}
+
 		string wholefilename = "E:\\tmp\\321\\tNMresult.txt";
 
 		WCHAR   wstr[MAX_PATH];
@@ -729,10 +763,10 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 
 					int pos6_1 = result_name[i].rfind("\\");
 					fn6_1 = result_name[i].substr(pos6_1 + 1, result_name[i].length());//读取路径最后的文件名
-					result_name[i] = result[0] + fn6_1;
-
+					result_name[i] = resultname3 + fn6_1;
+					
 					//cout << "[i]: " << i << endl;
-					//cout << "resul_name[i]: " << result_name[i] << endl;
+					cout << "resul_name[i]: " << result_name[i] << endl;
 					//cout << "result_num[i]: " << result_num[i] << endl;
 
 					//WCHAR   wstr[MAX_PATH];
