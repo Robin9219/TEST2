@@ -78,7 +78,7 @@ public:
 	//ÏÔÊ¾Í¼Æ¬µ½picture¿Ø¼þ
 	void ShowImage2(IplImage *img, UINT ID);
 	bool ShowCurrentPatientResult(vector<MN_HandleResultOnePic> currentpatientresult,int page);
-	
+	void ClearLittleImgRes();
 	afx_msg void OnBnClickedBtnLastmn();
 	afx_msg void OnBnClickedBtnNextmn();
 	afx_msg void OnBnClickedBtnNinc1();
@@ -173,4 +173,5 @@ public:
 	afx_msg void OnBnClickedBtnMndec21();
 
 	CMFCButton m_ninc1;
+	afx_msg void OnBnClickedMainframe();
 };

@@ -174,6 +174,7 @@ public:
 	afx_msg void OnBnClickedBtnParaset();
 	afx_msg void OnBnClickedBtnHandle();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnBnClickedFrame1();
 };
 
 DWORD WINAPI ThreadProc(PVOID pParam);//开辟的扫描线程执行函数

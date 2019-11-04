@@ -218,6 +218,7 @@ BOOL CChromosomeResult::OnInitDialog()
 	m_point_sum.SetFont(&font_PointSum, FALSE);
 	m_chro_num.SetFont(&font_PointSum, FALSE);
 	//m_point_sum.SetBackColor(TRANS_BACK);
+	/*OnCbnSelchangeComboPatientch();*/
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常:  OCX 属性页应返回 FALSE
 }
@@ -240,6 +241,7 @@ void CChromosomeResult::PutPicControlIntoVector()
 }
 
 // 数据库中获取所有的病人名
+//没用到
 void CChromosomeResult::GetAllPatientNames()
 {
 	sql = _T("select * from 染色体图像分析结果数据表");
@@ -2180,7 +2182,6 @@ void CChromosomeResult::OnBnClickedBtnLast()
 	}
 
 }
-
 
 
 //下一步

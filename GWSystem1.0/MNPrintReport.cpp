@@ -47,6 +47,7 @@ END_MESSAGE_MAP()
 
 
 // CMNPrintReport 消息处理程序
+//没用
 LRESULT CMNPrintReport::InitialList1(WPARAM wParam, LPARAM lParam)//传递可打印报表的病人
 {
 	 p = (vector<WaitToPrint>* )wParam;

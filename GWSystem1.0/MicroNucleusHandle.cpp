@@ -248,6 +248,15 @@ LRESULT CMicroNucleusHandle::InitialList2(WPARAM wParam, LPARAM lParam)
 //开始分析
 void CMicroNucleusHandle::OnBnClickedBtnMicrohandle()
 {
+
+	//MN_NumCheck aa;
+	//aa.LittleImgPath[0] = "E:\\GW123\\2019111_09-55-09Dir\\handle\\1101-MN-2019-11-1-17-08-17result\\shuang\\#1$-005000261.bmp.jpeg";
+	//aa.MNNum[0] = "5";
+	//aa.CellNuclearNum[0] = "2";
+	//aa.ArraySize = 1;
+
+	//ReadAndWriteMN.WritetheMNIntoAccess(aa);
+
 	// TODO:  在此添加控件通知处理程序代码
 
 	AnalyseFinishedMN = false;
@@ -273,8 +282,8 @@ void CMicroNucleusHandle::OnBnClickedBtnMicrohandle()
 			Row.push_back(i);
 		}
 	}
-	cout << "AllPatientsChose.size()" << AllPatientsChose.size() << endl;
-	cout << "AllPatientsChose[1].PatientName" << AllPatientsChose[1].PatientName << endl;
+	//cout << "AllPatientsChose.size()" << AllPatientsChose.size() << endl;
+	//cout << "AllPatientsChose[1].PatientName" << AllPatientsChose[1].PatientName << endl;
 	
 
 
@@ -654,6 +663,7 @@ void CMicroNucleusHandle::OnBnClickedBtnMicrosolve()
 }
 
 //清空数据库中的一些表格
+//空，没用到
 void CMicroNucleusHandle::DeleteAccessTable()
 {
 	_bstr_t sql;
@@ -705,6 +715,7 @@ void CMicroNucleusHandle::OnBnClickedBtnMicroprint()
 }
 
 // 加入可生成报表的结构体
+//空，没用到
 void CMicroNucleusHandle::MNJoinWaitToPrint(CString patientname, string savepath)
 {
 	WaitToPrint mnWaitToPrint;
@@ -714,7 +725,7 @@ void CMicroNucleusHandle::MNJoinWaitToPrint(CString patientname, string savepath
 }
 
 
-//某个项已经发生变化
+//空，没用到
 void CMicroNucleusHandle::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
@@ -932,7 +943,7 @@ void CMicroNucleusHandle::OnBnClickedBtnFindmn()
 
 }
 
-
+//空，没用到
 void CMicroNucleusHandle::OnNMCustomdrawList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
@@ -1183,7 +1194,7 @@ bool CMicroNucleusHandle::LoadCurrentToList()
 	return true;
 }
 
-//单击切换结果
+//单击切换结果，显示结果表中的结果柱状图
 void CMicroNucleusHandle::OnNMClickListResultchro(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -1253,6 +1264,7 @@ BOOL CMicroNucleusHandle::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResul
 	return CDialogEx::OnNotify(wParam, lParam, pResult);
 }
 
+//没用到
 void CMicroNucleusHandle::DeltePatientImage()
 {
 	for (size_t i = 0; i < WaitingDeleteImg.size(); i++)

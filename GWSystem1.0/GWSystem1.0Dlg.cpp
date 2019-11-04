@@ -1021,6 +1021,10 @@ void CGWSystem10Dlg::OnTimer(UINT_PTR nIDEvent)
 //微核分析
 void CGWSystem10Dlg::OnBnClickedBtnIkaros()
 {
+
+
+
+
 	// TODO:  在此添加控件通知处理程序代码
 	if (!BuildOrNotMN)
 	{

@@ -346,6 +346,16 @@ struct PatientAndCurImg
 	string currentImgPath;
 };  
 
+//微核数量校正结构
+struct MN_NumCheck
+{
+	string LittleImgPath[200];
+	string CellNuclearNum[200];
+	string MNNum[200];
+	int ArraySize;
+
+};
+
 /***************************************数据库表格相关结构体*************************************************/
 //玻片设置
 struct Table_SlideSet{

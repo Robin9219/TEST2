@@ -43,6 +43,11 @@ string result[40000];
 string result_name[20000];
 string result_num[20000];
 
+//string xb_name[200];
+//string txt_xbh[200];
+//string txt_wh[200];
+MN_NumCheck MN_Save;
+
 CMicroNucleusAlgorithm::CMicroNucleusAlgorithm()
 {
 	//pB->allcell = 0;
@@ -607,6 +612,7 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 
 		string wholefilename = "E:\\tmp\\321\\tNMresult.txt";
 
+		//删除txt
 		WCHAR   wstr[MAX_PATH];
 		char sucTempFilePath[MAX_PATH + 1];
 		sprintf_s(sucTempFilePath, "%s", wholefilename.c_str());
@@ -625,6 +631,11 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 		{
 			std::cout << "指定工作目录：文件找不到" << std::endl;
 		}
+
+		//while ((int)hNewExe == ERROR_FILE_NOT_FOUND)
+		//{
+		//	HINSTANCE hNewExe = ShellExecuteA(NULL, "open", "E:\\GWsystem\\ReleaseSX\\opencv_cpp2py.exe", NULL, NULL, SW_HIDE);
+		//}
 
 		//CString path = _T("‪‪E:\\GWsystem\\111vector_predict\\x64\\Release\\opencv_cpp2py.exe");
 		//SHELLEXECUTEINFO ShExecInfo = { 0 };
@@ -668,7 +679,7 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 				{
 					for (int i = 0; fin >> aa[i]; i++)
 					{
-						cout<<"第 "<<(++rowNum)<<" 行数据："<<aa[i] <<" i："<<i <<" " << endl;
+						//cout<<"第 "<<(++rowNum)<<" 行数据："<<aa[i] <<" i："<<i <<" " << endl;
 						++rowNum;
 					}
 
@@ -913,6 +924,53 @@ MN_HandleResult* CMicroNucleusAlgorithm::handlemicronucleus(vector<string>ImgWai
 				sprintf_s(sucTempFilePath, "%s", wholefilename.c_str());
 				MultiByteToWideChar(CP_ACP, 0, sucTempFilePath, -1, wstr, sizeof(wstr));
 				DeleteFile(wstr);
+
+				////解析第二个txt
+				//fstream fin_nmck("E:\\tmp\\321\\wh_result.txt");
+				//// 打开文件成功
+				//string aa_mnck[20000];
+				//int rowNum_mnck = 0;
+				//if (fin_nmck)
+				//{
+
+				//	for (int i = 0; fin_nmck >> aa_mnck[i]; i++)
+				//	{
+				//		//cout<<"第 "<<(++rowNum)<<" 行数据："<<aa[i] <<" i："<<i <<" " << endl;
+				//		++rowNum_mnck;
+				//	}
+
+				//	fin_nmck.close();
+				//}
+				//else
+				//{
+				//	cerr << "打开文件失败！" << endl;
+				//}
+
+				//int k = 0;
+				//for (int i = 0; i<rowNum_mnck; i = i + 3)
+				//{
+				//	//cout << "第 " << (i) << " 行数据：" << aa[i] << " " << endl;
+				//	MN_Save.LittleImgPath[k] = aa_mnck[i];
+				//	MN_Save.CellNuclearNum[k] = aa_mnck[i + 1];
+				//	MN_Save.MNNum[k] = aa_mnck[i + 2];
+				//	k++;
+				//}
+				//
+				////for (int i = 0; i<k; i++)
+				////{
+
+				////	cout << "1:" << xb_name[i] << endl;
+				////	cout << "2: " << txt_xbh[i] << endl;
+				////	cout << "3: " << txt_wh[i] << endl;
+				////	cout << "i:" << i << endl;
+				////}
+				//if (MN_Save.LittleImgPath[0] != "000"){
+
+				//	MN_Save.ArraySize = k - 1;
+				//	ReadMN.WritetheMNIntoAccess(MN_Save);
+				//}
+				
+
 
 			}
 			else

@@ -99,6 +99,10 @@ public:
 
 	//将统计出的结果写入本次分析表中
 	bool WriteIntoThisTurn(CHRO_HandleResult* OnePatient);
+
+	//将分析出的微核数存入数据库中
+	bool WritetheMNIntoAccess(MN_NumCheck MNCheck);
+
 };
 
 

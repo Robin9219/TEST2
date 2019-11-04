@@ -2099,3 +2099,63 @@ bool CReadAndWriteForAccess::WriteIntoThisTurn(CHRO_HandleResult* OnePatient)
 	}
 
 }
+
+//将分析出的微核数存入数据库中
+bool CReadAndWriteForAccess::WritetheMNIntoAccess(MN_NumCheck MNCheck)
+{
+	_bstr_t sql;
+	_variant_t var;
+	CString CellNum = _T("2");
+	CString mystr;
+	string mystring;
+	//sql = _T("select  * from 微核图像分析结果数据表");
+	sql = _T("select * from 微核图像分析结果数据表\
+			 			 			 		 where 微核图像分析结果数据表.[细胞核数]='" + CellNum + "'  ");
+
+	try
+	{
+
+		m_Conn.GetRecordSet(sql);
+	}
+	catch (_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
+
+
+
+	try
+	{
+		for (size_t i = 0; i < MNCheck.ArraySize; i++)
+		{
+			m_Conn.m_pRecordset->MoveFirst();
+
+			while (!m_Conn.m_pRecordset->adoEOF)
+			{
+				mystr = m_Conn.m_pRecordset->GetCollect(_T("照片路径"));
+				mystring = CStringtoString(mystr);
+
+				if (mystring == MNCheck.LittleImgPath[i])
+				{
+					//std::cout << "MNCheck.LittleImgPath[i]" << MNCheck.LittleImgPath[i] << std::endl;
+					//CString str_MNNum = MNCheck.MNNum[i].c_str();
+					USES_CONVERSION; CString str_MNNum(MNCheck.MNNum[i].c_str());
+					//std::cout << "str_MNNum" << str_MNNum << std::endl;
+					//std::cout << "MNCheck.MNNum[i]" << MNCheck.MNNum[i] << std::endl;
+
+					m_Conn.m_pRecordset->PutCollect(_T("微核数"), _variant_t(str_MNNum));
+					break;
+				}
+				
+				m_Conn.m_pRecordset->MoveNext();
+			}
+
+		}
+		//重要
+		m_Conn.m_pRecordset->Update();
+	}
+	catch (_com_error e)
+	{
+		AfxMessageBox(e.Description());
+	}
+}

@@ -124,6 +124,7 @@ BEGIN_MESSAGE_MAP(CMicroNucleusResult, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_MNDec19, &CMicroNucleusResult::OnBnClickedBtnMndec19)
 	ON_BN_CLICKED(IDC_BTN_MNDec20, &CMicroNucleusResult::OnBnClickedBtnMndec20)
 	ON_BN_CLICKED(IDC_BTN_MNDec21, &CMicroNucleusResult::OnBnClickedBtnMndec21)
+	ON_BN_CLICKED(IDR_MAINFRAME, &CMicroNucleusResult::OnBnClickedMainframe)
 END_MESSAGE_MAP()
 
 
@@ -587,6 +588,7 @@ void CMicroNucleusResult::OnBnClickedBtnLastmn()
 	{
 		PicClear(IDC_NameMN[v]);
 	}
+	ClearLittleImgRes();
 	Page--;
 
 	if (Page < 0)
@@ -643,6 +645,8 @@ void CMicroNucleusResult::OnBnClickedBtnNextmn()
 	{
 		PicClear(IDC_NameMN[v]);
 	}
+	ClearLittleImgRes();
+
 	if (Page > (_ttoi(sumpage)-1))
 		Page = _ttoi(sumpage) - 1;
 
@@ -681,8 +685,8 @@ MN_HandleResult * CMicroNucleusResult::CalculateMNResult(vector<MN_HandleResultO
 	memset(pB->MultiCellsWithMN, 0, sizeof(pB->MultiCellsWithMN));
 	memset(pB->TripleCellsWithMN, 0, sizeof(pB->TripleCellsWithMN));
 	for (size_t i = 0; i < 21 * (Page+1); i++)
-	{
-		if (21 * (Page + 1) <= currentpatientresult.size())
+	{ 
+		if (i < currentpatientresult.size())
 		{
 			switch (currentpatientresult[i].NumCells)
 			{
@@ -1148,6 +1152,17 @@ HBRUSH CMicroNucleusResult::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	return hbr;
 }
 
+//将本页的小图结果清零
+void CMicroNucleusResult::ClearLittleImgRes()
+{
+	CString str = _T("0");
+	for (size_t i = 0; i < 21; i++)
+	{
+		GetDlgItem(ID_StaticN[i])->SetWindowTextW(str);
+		GetDlgItem(ID_StaticMN[i])->SetWindowTextW(str);
+	}
+
+}
 
 
 
@@ -3526,4 +3541,10 @@ void CMicroNucleusResult::OnBnClickedBtnMndec21()
 		ReadAndWriteMNResult.SaveToAccessMN(result, pHandleDlg->SelectedName, CurrentPatientResult[21 * Page + 20]);
 	}
 
+}
+
+
+void CMicroNucleusResult::OnBnClickedMainframe()
+{
+	// TODO:  在此添加控件通知处理程序代码
 }

@@ -360,7 +360,7 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 		vector<string>ImgWaitingForAna;
 		int ImgNum = 0;
 
-		cout << "ChroImgNames.size:" << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
+		//cout << "ChroImgNames.size:" << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
 		while (pHandleDlg->patientNewImg)//判断该病人是否有新的图片加入
 		{
 			string readpath = CT2A(pHandleDlg->AllPatientsChose[i].ImgPath.GetBuffer());
@@ -398,10 +398,10 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 
 					int ImgNum = ReadAndWrite.CountChromosome(pHandleDlg->AllPatientsChose[i].PatientName);
 
-					cout << "ImgNum" << ImgNum << endl;
-					cout << "Max_ChromImgNum" << Max_ChromImgNum << endl;
-					cout << "alalysedNum: " << alalysedNum << endl;
-					cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size() << endl;
+					//cout << "ImgNum" << ImgNum << endl;
+					//cout << "Max_ChromImgNum" << Max_ChromImgNum << endl;
+					//cout << "alalysedNum: " << alalysedNum << endl;
+					//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size() << endl;
 					if (alalysedNum <=pHandleDlg->AllPatientsChose[i].ChroImgNames.size())
 					{
 
@@ -458,10 +458,10 @@ void CChromosomeHandle::ThreadProcWaitCHRO()
 					vector<string>().swap(ImgWaitingForAna);
 
 					int ImgNum = ReadAndWrite.CountChromosome(pHandleDlg->AllPatientsChose[i].PatientName);
-					cout << "ImgNum" << ImgNum << endl;
-					cout << "Max_ChromImgNum" << Max_ChromImgNum << endl;
-					cout << "alalysedNum: " << alalysedNum << endl;
-					cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size() << endl;
+					//cout << "ImgNum" << ImgNum << endl;
+					//cout << "Max_ChromImgNum" << Max_ChromImgNum << endl;
+					//cout << "alalysedNum: " << alalysedNum << endl;
+					//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size() << endl;
 
 					//cout << "alalysedNum: " << alalysedNum;
 					//cout << "AllPatientsChose[i].ChroImgNames.size: " << pHandleDlg->AllPatientsChose[i].ChroImgNames.size();
